@@ -14,7 +14,7 @@ void Ball::Update()
 {
     x += speedX;
     y += speedY;
-    
+
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
     
