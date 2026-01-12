@@ -10,7 +10,7 @@ int main()
     constexpr int screenHeight = 1000;
     
     Ball ball;
-    
+    FillMap();
     InitWindow(screenWidth, screenHeight, "Assignment 4 Aaron Kallio");
     SetTargetFPS(60);
     
@@ -21,8 +21,10 @@ int main()
         BeginDrawing();
         ClearBackground(BLACK);
         ball.Draw();
-        EndDrawing();
         DrawRectangle(0,0,10,10,GREEN);
+        RunMap();
+        EndDrawing();
+        
     }
     
     CloseWindow();

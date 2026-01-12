@@ -5,13 +5,14 @@
 #include <queue>
 #include <cfloat>
 #include <fstream>
+#include <iostream>
 using namespace std;
 int pathMode = 0;
 int mode = 1;
 double timed;
 std::vector<Map> maps;
-
-
+Map theMap;
+/*
 bool Map::IsValid(int row, int col)
 {
     return (row >= 0) && (row < width) && (col >= 0)
@@ -405,7 +406,7 @@ void ResetMap(int mapNum) {  //resets all nodes when changing maps
         }
     }
 }
-
+*/
 
 int WhichMap() {
 	//if (Play::KeyPressed(Play::KEY_1)) {
@@ -421,7 +422,7 @@ int WhichMap() {
 }
 
 int WhichPathFinding() {
-    int funcPathNode = 0;
+    //int funcPathNode = 0;
     //if (Play::KeyPressed(Play::KEY_4)) {
     //   funcPathNode = 4;
     //}
@@ -437,6 +438,7 @@ int WhichPathFinding() {
     //return funcPathNode;
 }
 
+/*
 void RunPathFinding(int mapNum) {  
     int temp = WhichPathFinding();
     std::string elapsedStr = std::to_string(timed) + "ms";
@@ -482,17 +484,19 @@ void RunPathFinding(int mapNum) {
     }
 }
 
-
+*/
 
 
 void FillMap(){
-	Map map1; map1.MapFill("map1.txt"); maps.push_back(map1);
-	Map map2; map2.MapFill("map2.txt"); maps.push_back(map2);
-	Map map3; map3.MapFill("map3.txt"); maps.push_back(map3);
+	theMap.MapFill("src/MapSimulation.txt");
+    //theMap.PlaceTrees(5);
+    cout << "poop" << endl;
+	//Map map2; map2.MapFill("map2.txt"); maps.push_back(map2);
+	//Map map3; map3.MapFill("map3.txt"); maps.push_back(map3);
 }
 
-void RunMap(int num) {
-	maps[num].DrawMap();
+void RunMap() {
+	theMap.DrawMap();
 }
 
 
@@ -507,102 +511,176 @@ Map::~Map() {
 }
 
 void Map::MapFill(const std::string& fileName) {
-	std::ifstream file(fileName);
-	if (!file.is_open()) {
-		//DrawDebugText({100,100},"txt file not loading", cWhite);
-		return;
-	}
-	std::string line;
-	grid.clear();
-	while (std::getline(file, line)) {
-		if (width == 0) { 
-			width = line.size();
-		}
-		std::vector<Node> row;               //fills up temp row for 2D array
-		for (int x = 0; x < line.size(); ++x) {
-			row.emplace_back(x, grid.size(), line[x],unvisited,0,0,0,0,0);
-		}
-		grid.push_back(row); //adds row to 2D array
-	}
-	height = grid.size();
-	file.close();
-	ConnectNodes();
+    width = 0;
+    height = 0;
+    grid.clear();
+
+    std::ifstream file(fileName);
+    if (!file.is_open()) {
+        //cout << "bruh\n";
+        return;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        if (width == 0) {
+            width = line.size();
+        }
+
+        std::vector<Node> row;
+        for (int x = 0; x < line.size(); ++x) {
+            row.emplace_back(x, grid.size(), line[x], 0,0,0,0,0);
+        }
+        grid.push_back(row);
+    }
+
+    height = grid.size();
+    ConnectNodes();
 }
 
 void Map::ConnectNodes() {
-	for (float y = 0; y < height; ++y) {
-		for (float x = 0; x < width; ++x) {
-			Node& current = grid[y][x];
-			current.position = { x * 35,y * 35 };
-			if (current.type == 'X') continue;
+    for (int y = 0; y < grid.size(); ++y) {
+        for (int x = 0; x < grid[y].size(); ++x) {
 
-			if (y > 0 && grid[y - 1][x].type != 'X') { 
-				current.connectedNodes.push_back(&grid[y - 1][x]);
-			}
-			if (y < height - 1 && grid[y + 1][x].type != 'X') {
-				current.connectedNodes.push_back(&grid[y + 1][x]);
-			}
-			if (x > 0 && grid[y][x - 1].type != 'X') { 
-				current.connectedNodes.push_back(&grid[y][x - 1]); 
-			}
-			if (x < width - 1 && grid[y][x + 1].type != 'X') {
-				current.connectedNodes.push_back(&grid[y][x + 1]);
-			}
-		}
-	}
-}
+            Node& current = grid[y][x];
+            current.position = { x * 10.0f, y * 10.0f };
 
-void Map::DrawMap() {
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			Node& current = grid[y][x];
-			Vector2 bottomLeft = current.position;
-			Vector2 topRight = { current.position.x + 35,current.position.y + 35 };
-			char tempType = current.type;
-			if (tempType == 'X') {
-				//DrawRect(bottomLeft, topRight, cWhite, true);
-			}
-			else if (tempType == '0') {
-				if (current.nodeStatus == visited) {
-					//DrawRect(bottomLeft, topRight, cRed, true);
-				}
-				else if (current.nodeStatus == unvisited) {
-					//DrawRect(bottomLeft, topRight, cBlack, true);
-				}
-				else {
-					//DrawRect(bottomLeft, topRight, cBlue, true);
-				}
-			}
-			else if (tempType == 'S') {
-				//DrawRect(bottomLeft, topRight, cYellow, true);
-			}
-			else if (tempType == 'G') {
-				//DrawRect(bottomLeft, topRight, cGreen, true);
-			}
+            if (current.type == 'B') continue;
+            if (current.type == 'T') current.PlaceTrees(5);
+            if (current.type == 'V'||current.type == 'B') current.passable = false;
 
-		}
-	}
-    if (path.empty()) return;
+            // up
+            if (y > 0 && x < grid[y - 1].size() && grid[y - 1][x].type != 'B') {
+                current.connectedNodes.push_back(&grid[y - 1][x]);
+            }
 
-    auto tempPath = path;
+            if (y + 1 < grid.size() && x < grid[y + 1].size() && grid[y + 1][x].type != 'B') {
+                current.connectedNodes.push_back(&grid[y + 1][x]);
+            }
 
-    Pair endPoint = tempPath.top();
-    tempPath.pop();
+            // left
+            if (x > 0 && grid[y][x - 1].type != 'B') {
+                current.connectedNodes.push_back(&grid[y][x - 1]);
+            }
 
-    while (!tempPath.empty()) {
-        Pair startPoint = tempPath.top();
-        tempPath.pop();
-
-        // Convert grid coordinates to screen coordinates
-        Vector2 p1 = { startPoint.second * 35 + 13, startPoint.first * 35 + 13 };
-        Vector2 p2 = { endPoint.second * 35 + 13, endPoint.first * 35 + 13 };
-        //DrawLine(p1, p2, cGreen);
-
-        endPoint = startPoint; // move to next segment
+            // right
+            if (x + 1 < grid[y].size() && grid[y][x + 1].type != 'B') {
+                current.connectedNodes.push_back(&grid[y][x + 1]);
+            }
+        }
     }
 }
 
+void Map::DrawMap() {
+    //cout << "bob" << endl;
+	for (int y = 0; y < grid.size(); ++y) {
+    for (int x = 0; x < grid[y].size(); ++x) {
+        Node& current = grid[y][x];
+            //out << current.type << endl;
+			Vector2 bottomLeft = current.position;
+			Vector2 topRight = { current.position.x + 10,current.position.y + 10 };
+			char tempType = current.type;
+			if (tempType == 'T') {
+				//DrawRect(bottomLeft, topRight, cWhite, true);
+                DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
+			}
+			else if (tempType == 'V') {
+                DrawRectangle(current.position.x,current.position.y,10,10,BLUE);
+			}
+			else if (tempType == 'G') {
+				//DrawRect(bottomLeft, topRight, cYellow, true);
+                DrawRectangle(current.position.x,current.position.y,10,10,BROWN);
+			}
+			else if (tempType == 'B') {
+				//DrawRect(bottomLeft, topRight, cGreen, true);
+                DrawRectangle(current.position.x,current.position.y,10,10,GRAY);
 
+			}
+            else if (tempType == 'M') {
+				//DrawRect(bottomLeft, topRight, cGreen, true);
+                DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
+			}
+            for(int j = 0;j < current.objects.size();j++){
+                if(current.objects[j].first == 'T'){
+                    DrawPixel(current.position.x + current.objects[j].second.first,current.position.y + current.objects[j].second.second,DARKGREEN);
+                }
+            }
+
+		}
+	}
+    //if (path.empty()) return;
+
+    //auto tempPath = path;
+
+    //Pair endPoint = tempPath.top();
+    //tempPath.pop();
+
+    //while (!tempPath.empty()) {
+        //Pair startPoint = tempPath.top();
+        //tempPath.pop();
+
+        // Convert grid coordinates to screen coordinates
+        //Vector2 p1 = { startPoint.second * 10, startPoint.first * 10 };
+        //Vector2 p2 = { endPoint.second * 10, endPoint.first * 10 };
+        //DrawLine(p1, p2, cGreen);
+
+        //endPoint = startPoint; // move to next segment
+    }
+
+
+void Node::PlaceTrees(int count) {
+    // Place the first tree
+    objects.push_back({'T', {GetRandomValue(0, 9), GetRandomValue(0, 9)}});
+
+    for (int i = 1; i < count; i++) {
+        bool foundSpot = false;
+
+        while (!foundSpot) {
+            int randomX = GetRandomValue(0, 9);
+            int randomY = GetRandomValue(0, 9);
+            bool safe = true;
+
+            // Check if a tree is already at this position
+            for (auto& obj : objects) {
+                if (obj.second.first == randomX && obj.second.second == randomY) {
+                    safe = false;
+                    break;
+                }
+            }
+
+            if (safe) {
+                objects.push_back({'T', {randomX, randomY}});
+                foundSpot = true;
+            }
+        }
+    }
+}
+
+/*
+void Node::PlaceTrees(int count) {
+    //std::mt19937 rng(12345);
+    objects.push_back(("T",(GetRandomValue(0,10),GetRandomValue(0,10))));
+    for(int i = 0;i < count-1;i++){
+        bool foundSpot = false;
+        while(!foundSpot){
+            bool safe = true;
+            int randomX = GetRandomValue(0,10);
+            int randomY = GetRandomValue(0,10);
+            for(int j = 0;j < objects.size();j++){
+                if(objects[j].second.first==randomX||objects[j].second.first==randomY){
+                    safe = false;
+                    break;
+                }
+            }
+            if(safe){
+                foundSpot = true;
+                objects.push_back(("T",(randomX,randomY)));
+            }
+        }
+    }
+}
+*/
+/*
 void Map::BFS(Pair start, Pair end) {
     while (!path.empty())
         path.pop();
@@ -1152,3 +1230,4 @@ void getDirection(Pair start, Pair end, int dRow[8], int dCol[8]) {
         return;
     }
 }
+    */
