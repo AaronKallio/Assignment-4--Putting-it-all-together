@@ -28,7 +28,7 @@ void Place()
 
     for (size_t i = 0; i < CHARACTER_COUNT; ++i) {
         Character c;
-        c.pos = {50.0f * i + 15.0f, 980.0f};
+        c.pos = {(float)i * 3 +15, 980.0f};
         characters.emplace_back(c);
     }
 
@@ -38,11 +38,15 @@ void Place()
 void DrawCharacters()
 {
     for (const Character& c : characters) {
-        DrawPixel(
+       //cout << c.pos.x << '\n'; 
+        DrawCircle(
             static_cast<int>(c.pos.x),
             static_cast<int>(c.pos.y),
+            1,
             RED
         );
+        //DrawCircle(c.pos.x,c.pos.y,1000,RED);
+        //DrawCircle(500,500,1000,RED);
     }
 }
 

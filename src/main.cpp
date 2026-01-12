@@ -18,14 +18,15 @@ int main()
     
     while (!WindowShouldClose())
     {
-        ball.Update();
+        //ball.Update();
         
         BeginDrawing();
         ClearBackground(BLACK);
-        ball.Draw();
+        //ball.Draw();
+        RunMap();
         DrawRectangle(0,0,10,10,GREEN);
         DrawCharacters();
-        RunMap();
+        
         EndDrawing();
         
     }
