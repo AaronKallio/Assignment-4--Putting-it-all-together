@@ -408,7 +408,7 @@ void ResetMap(int mapNum) {  //resets all nodes when changing maps
 }
 */
 
-int WhichMap() {
+//int WhichMap() {
 	//if (Play::KeyPressed(Play::KEY_1)) {
 	//	mode = 1;
 	//}
@@ -419,9 +419,9 @@ int WhichMap() {
 	//	mode = 3;
 	//}
 	//return mode;
-}
+//}
 
-int WhichPathFinding() {
+//int WhichPathFinding() {
     //int funcPathNode = 0;
     //if (Play::KeyPressed(Play::KEY_4)) {
     //   funcPathNode = 4;
@@ -436,7 +436,7 @@ int WhichPathFinding() {
      //   funcPathNode = 7;
     //}
     //return funcPathNode;
-}
+//}
 
 /*
 void RunPathFinding(int mapNum) {  
@@ -580,7 +580,11 @@ void Map::DrawMap() {
 			Vector2 bottomLeft = current.position;
 			Vector2 topRight = { current.position.x + 10,current.position.y + 10 };
 			char tempType = current.type;
-			if (tempType == 'T') {
+            if (current.discovered == false) {
+				//DrawRect(bottomLeft, topRight, cWhite, true);
+                DrawRectangle(current.position.x,current.position.y,10,10,BLACK);
+			}
+			else if (tempType == 'T') {
 				//DrawRect(bottomLeft, topRight, cWhite, true);
                 DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
 			}
@@ -601,7 +605,7 @@ void Map::DrawMap() {
                 DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
 			}
             for(int j = 0;j < current.objects.size();j++){
-                if(current.objects[j].first == 'T'){
+                if(current.objects[j].first == 'T' &&current.discovered == true){
                     DrawPixel(current.position.x + current.objects[j].second.first,current.position.y + current.objects[j].second.second,DARKGREEN);
                 }
             }

@@ -36,8 +36,9 @@ public:
 	std::vector<Object> objects;
 	bool passable;
 	char building;
+	bool discovered;
 	Node(int x, int y, char t, float pI, float pJ, float f1, float g1, float h1)
-		: position{x,y}, type(t), parentI(pI), parentJ(pJ), f(f1), g(g1), h(h1), passable(true){}
+		: position{x,y}, type(t), parentI(pI), parentJ(pJ), f(f1), g(g1), h(h1), passable(true), discovered(true){}
 	void PlaceTrees(int count);
 };
 // Creating a shortcut for int, int pair type
