@@ -1,12 +1,13 @@
 #pragma once
-#include "vector"
+#include <vector>
 #include <raylib.h>
 #include <stack>
 #include <set>
 #include <string> 
 using namespace std;
 #include <random>
-
+#include <utility>
+#include <cfloat>
 
 
 void FillMap();
@@ -53,18 +54,35 @@ public:
 	Map();
 	~Map();
 	void BFS(Pair start, Pair end);
-	bool IsValid(int row, int col);
-	bool IsUnBlocked(int row, int col);
-	bool IsDestination(int row, int col, Pair dest);
-	double CalculateHValue(int row, int col, Pair dest);
-	void TracePath(Pair dest);
-	void AStarSearch(Pair src, Pair dest);
+	//bool IsValid(int row, int col);
+	//bool IsUnBlocked(int row, int col);
+	//bool IsDestination(int row, int col, Pair dest);
+	//double CalculateHValue(int row, int col, Pair dest);
+	//void TracePath(Pair dest);
+	//void AStarSearch(Pair src, Pair dest);
 	void DFS(Pair start, Pair end);
 	void Dijkstra(Pair src, Pair dest);
 	void PlaceTrees(int count);
+	//bool IsValid(int row, int col) const;
+	//bool IsWalkable(int row, int col) const;
+	//float Heuristic(int row, int col, Pair dest) const;
 
+	bool AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath);
+	const std::vector<Vector2>& GetLastPath() const;
 private:
 	void ConnectNodes();
+	struct AStarNode {
+        float f = FLT_MAX;
+        float g = FLT_MAX;
+        float h = FLT_MAX;
+        int parentRow = -1;
+        int parentCol = -1;
+    };
+
+    bool IsValid(int row, int col) const;
+    bool IsWalkable(int row, int col) const;
+    float Heuristic(int row, int col, Pair dest) const;
+	std::vector<Vector2> lastPath;
 };
 
 
@@ -76,3 +94,4 @@ void RunBFS(int mapNum);
 void RunDFS(int mapNum);
 void RunDijkstra(int mapNum);
 void getDirection(Pair start, Pair end, int dRow[8], int dCol[8]);
+Map GetMap();

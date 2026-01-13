@@ -15,7 +15,6 @@ int main()
     FillMap();
     Place();
     
-    
     while (!WindowShouldClose())
     {
         //ball.Update();
@@ -25,6 +24,7 @@ int main()
         //ball.Draw();
         RunMap();
         DrawRectangle(0,0,10,10,GREEN);
+        RunCharacters();
         DrawCharacters();
         
         EndDrawing();

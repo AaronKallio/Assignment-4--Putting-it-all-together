@@ -5,6 +5,7 @@
 #include <set> 
 #include <string> 
 #include <random>
+#include "map.h"
 
 
 enum Type{
@@ -28,8 +29,17 @@ public:
 	Vector2 collisionVector;
 	int previousPath;
     Type type;
+	float speed;
+	
+	void RequestPath(Map& map, Pair target);
+    void Update(float dt);
 	Character();
-	//~Character();
+
+private:
+	std::vector<Pair> path;
+    size_t currentNode = 0;
+	int currentPathIndex;
 };
 void Place();
 void DrawCharacters();
+void RunCharacters();

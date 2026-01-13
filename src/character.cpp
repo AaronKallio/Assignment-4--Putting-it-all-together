@@ -1,5 +1,6 @@
 #include "character.h"
 #include <iostream>
+#include "raymath.h" 
 using namespace std;
 
 
@@ -25,11 +26,13 @@ void Place()
 
     characters.clear();
     characters.reserve(CHARACTER_COUNT);
-
+	Map map = GetMap();
     for (size_t i = 0; i < CHARACTER_COUNT; ++i) {
         Character c;
-        c.pos = {(float)i * 3 +15, 980.0f};
+        //c.pos = {(float)i * 3 +15, 980.0f};
+		c.pos = {(float)i * 3 +10, 900.0f};
         characters.emplace_back(c);
+		characters[i].RequestPath(map,{10,98});
     }
 
     cout << "Characters placed: " << characters.size() << '\n';
@@ -49,11 +52,43 @@ void DrawCharacters()
         //DrawCircle(500,500,1000,RED);
     }
 }
+void RunCharacters(){
+	for(int i = 0; i < characters.size();i++){
+		characters[i].Update(GetFrameTime());
+	}
+}
 
 
 
 
+void Character::RequestPath(Map& map, Pair target)
+{
 
+    Pair start = { (int)(pos.y / 10.0f), (int)(pos.x / 10.0f) }; 
+    Pair goal  = target; 
+
+    if (map.AStarSearch(start, goal, path)) {
+        currentNode = 0;
+    }
+}
+
+void Character::Update(float dt)
+{
+    if (currentNode >= path.size())
+        return;
+
+
+    Vector2 target = { path[currentNode].second * 10.0f, path[currentNode].first * 10.0f };
+    Vector2 dir = Vector2Subtract(target, pos);
+    float dist = Vector2Length(dir);
+    if (dist < 2.0f) {
+        currentNode++;
+        return;
+    }
+
+    dir = Vector2Normalize(dir);
+    pos += dir * 60.0f * dt;
+}
 
 
 

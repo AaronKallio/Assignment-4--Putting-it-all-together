@@ -3,9 +3,10 @@
 #include <set>
 #include <chrono>
 #include <queue>
-#include <cfloat>
+//#include <cfloat>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 int pathMode = 0;
 int mode = 1;
@@ -486,6 +487,15 @@ void RunPathFinding(int mapNum) {
 
 */
 
+namespace {
+    const int dRow[8] = {-1, 1, 0, 0, -1, -1, 1, 1};
+    const int dCol[8] = {0, 0, -1, 1, -1, 1, -1, 1};
+
+    const float moveCost[8] = {
+        10, 10, 10, 10,
+        14, 14, 14, 14
+    };
+}
 
 void FillMap(){
 	theMap.MapFill("src/MapSimulation.txt");
@@ -659,6 +669,135 @@ void Node::PlaceTrees(int count) {
         }
     }
 }
+
+
+
+bool Map::IsValid(int row, int col) const
+{
+    return row >= 0 && row < height &&
+           col >= 0 && col < width;
+}
+
+bool Map::IsWalkable(int row, int col) const
+{
+    if(grid[row][col].type == 'V' || grid[row][col].type == 'B'){
+        return false;
+    }
+    return true;
+    //return grid[row][col].type != 'V' || grid[row][col].type != 'B';
+    //return grid[row][col].type != 'X';
+}
+
+float Map::Heuristic(int row, int col, Pair dest) const
+{
+    int dx = abs(row - dest.first);
+    int dy = abs(col - dest.second);
+    return 10.0f * std::max(dx, dy); // Chebyshev (8-dir)
+}
+
+
+bool Map::AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath)
+{
+    
+    outPath.clear();
+
+    if (!IsValid(start.first, start.second) ||
+        !IsValid(goal.first, goal.second))
+        return false;
+    if (!IsWalkable(start.first, start.second) ||
+        !IsWalkable(goal.first, goal.second))
+        return false;
+
+    std::vector<std::vector<bool>> closed(height,
+        std::vector<bool>(width, false));
+
+    std::vector<std::vector<AStarNode>> nodes(height,
+        std::vector<AStarNode>(width));
+
+    auto& startNode = nodes[start.first][start.second];
+    startNode.g = 0.0f;
+    startNode.h = Heuristic(start.first, start.second, goal);
+    startNode.f = startNode.h;
+    startNode.parentRow = start.first;
+    startNode.parentCol = start.second;
+
+    std::set<std::pair<float, Pair>> open;
+    open.insert({startNode.f, start});
+
+    while (!open.empty()) {
+        auto current = *open.begin();
+        open.erase(open.begin());
+
+        int r = current.second.first;
+        int c = current.second.second;
+        closed[r][c] = true;
+
+        if (r == goal.first && c == goal.second) {
+            // reconstruct path
+            int cr = r, cc = c;
+            while (!(nodes[cr][cc].parentRow == cr &&
+                     nodes[cr][cc].parentCol == cc)) {
+                outPath.push_back({cr, cc});
+                int pr = nodes[cr][cc].parentRow;
+                int pc = nodes[cr][cc].parentCol;
+                cr = pr;
+                cc = pc;
+            }
+            outPath.push_back(start);
+            std::reverse(outPath.begin(), outPath.end());
+            return true;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            int nr = r + dRow[i];
+            int nc = c + dCol[i];
+
+            if (!IsValid(nr, nc) || closed[nr][nc])
+                continue;
+
+            // prevent corner cutting
+            if (i >= 4) {
+                if (!IsWalkable(r, nc) || !IsWalkable(nr, c))
+                    continue;
+            }
+
+            if (!IsWalkable(nr, nc))
+                continue;
+
+            float gNew = nodes[r][c].g + moveCost[i];
+            auto& neighbor = nodes[nr][nc];
+
+            if (gNew < neighbor.g) {
+                neighbor.g = gNew;
+                neighbor.h = Heuristic(nr, nc, goal);
+                neighbor.f = neighbor.g + neighbor.h;
+                neighbor.parentRow = r;
+                neighbor.parentCol = c;
+
+                open.insert({neighbor.f, {nr, nc}});
+            }
+        }
+    }
+    return false; // no path
+    
+   
+}
+
+const std::vector<Vector2>& Map::GetLastPath() const
+{
+    return lastPath;
+}
+
+
+Map GetMap(){
+    return theMap;
+}
+
+
+
+
+
+
 
 /*
 void Node::PlaceTrees(int count) {
