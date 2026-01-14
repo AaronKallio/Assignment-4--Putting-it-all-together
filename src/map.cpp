@@ -138,7 +138,7 @@ void Map::DrawMap() {
 				//DrawRect(bottomLeft, topRight, cGreen, true);
             DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
 		}
-
+        //DrawRectangle(270,540,10,10,BLACK);
         for(int j = 0;j < current.objects.size();j++){
             if(current.objects[j].first == 'T'){// &&current.discovered == true){
                 //DrawCircle(
@@ -309,7 +309,7 @@ const std::vector<Vector2>& Map::GetLastPath() const
 }
 
 
-Map GetMap(){
+Map& GetMap(){
     return theMap;
 }
 
@@ -322,10 +322,23 @@ Node& Map::GetNodeAtWorld(Vector2 worldPos)
 }
 
 void Map::RemoveTree(int y, int x){
-    for(int i = 0; i < grid[y][x].objects.size();i++){ 
-        if(grid[y][x].objects[i].first=='T'){ 
-            grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
-            return; 
-        } 
+    DrawRectangle(10,10,1000,1000,BLACK);
+    for(int i = 0; i < 5;i++){ 
+        
+        //if(grid[y][x].objects[i].first=='T'){ 
+        //    grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
+        //    cout<<"idddddddddddddddddddk man"<<'\n';
+            //std::string elapsedStr1 = to_string(grid[y][x].position.y);
+	        //const char* cstr1 = elapsedStr1.c_str();
+	        //DrawText(cstr1,500,400,50,PURPLE);
+            cout<<grid[y][x].position.y<<'\n';
+            cout<<grid[y][x].position.x<<'\n';
+
+        //    DrawRectangle(grid[y][x].position.x,grid[y][x].position.y,10,10,GRAY);
+        //    return; 
+        //} 
+        cout<<grid[y][x].objects[i].first<<'\n';
+        grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
+        
         } 
     }

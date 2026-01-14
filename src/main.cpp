@@ -26,14 +26,17 @@ int main()
         
         BeginDrawing();
         ClearBackground(BLACK);
-        
+        RunMap();
+        DrawCharacters();
         //ball.Draw();
         for(int i = 0; i < gameSpeed; i++){
-            RunMap();
+            //RunMap();
             RunCharacters();
             RunTask();
         }
-        DrawCharacters();
+        //RunMap();
+        //DrawCharacters();
+        //RunTask();
         int fps = GetFPS();
         DrawText(TextFormat("FPS: %d", fps), 10, 10, 20, PURPLE);
         EndDrawing();

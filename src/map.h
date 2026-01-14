@@ -95,5 +95,5 @@ void RunBFS(int mapNum);
 void RunDFS(int mapNum);
 void RunDijkstra(int mapNum);
 void getDirection(Pair start, Pair end, int dRow[8], int dCol[8]);
-Map GetMap();
+Map& GetMap();
 void InitObjectTextures();

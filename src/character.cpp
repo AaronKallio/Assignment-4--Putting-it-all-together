@@ -1,11 +1,10 @@
 #include "character.h"
-#include <iostream> 
 using namespace std;
 
 
 std::vector<Character> characters;
-Map map;
-
+//Map map;
+Map& map = GetMap();
 Character::Character()
     : pos{0.0f, 0.0f},
       velocity{0.0f, 0.0f},
@@ -20,7 +19,7 @@ Character::Character()
 }
 
 void Place(){
-	map = GetMap();
+	//map = GetMap();
     constexpr size_t CHARACTER_COUNT = 50;
     characters.clear();
     characters.reserve(CHARACTER_COUNT);

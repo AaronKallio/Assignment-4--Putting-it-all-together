@@ -7,6 +7,7 @@
 #include <random>
 #include "map.h"
 #include "raymath.h"
+#include <iostream> 
 //int felledTree = 0;
 
 enum State {
@@ -293,7 +294,8 @@ public:
 	std::string elapsedStr1 = to_string(distTest);
 	const char* cstr1 = elapsedStr1.c_str();
 	DrawText(cstr1,500,400,50,PURPLE);
-    if (c->currentPathIndex < 0 || c->currentPathIndex >= (int)c->path.size()|| distTest <=5.5f) {
+	//c->currentPathIndex < 0 || c->currentPathIndex >= (int)c->path.size()|| 
+    if (distTest <=2.5f) {
         pathRequested = false;
         return success;
     }
@@ -354,8 +356,10 @@ public:
 
         // Finished chopping
         elapsed = 0.0f; // reset for next use
+		//DrawText("rdgggggggggggggggggggg",500,500,50,BLACK);
 		map->RemoveTree(static_cast<int>(c->pos.y / 10),static_cast<int>(c->pos.x / 10));
 		c->pos = {0,0};
+		//cout<<"idk man";
         return success;
     }
 };
