@@ -5,6 +5,7 @@ using namespace std;
 
 
 std::vector<Character> characters;
+Map map;
 
 Character::Character()
     : pos{0.0f, 0.0f},
@@ -20,13 +21,11 @@ Character::Character()
 {
 }
 
-void Place()
-{
+void Place(){
+	map = GetMap();
     constexpr size_t CHARACTER_COUNT = 50;
-
     characters.clear();
     characters.reserve(CHARACTER_COUNT);
-	Map map = GetMap();
     for (size_t i = 0; i < CHARACTER_COUNT; ++i) {
         Character c;
         //c.pos = {(float)i * 3 +15, 980.0f};
@@ -38,15 +37,14 @@ void Place()
     cout << "Characters placed: " << characters.size() << '\n';
 }
 
-void DrawCharacters()
-{
+void DrawCharacters(){
     for (const Character& c : characters) {
        //cout << c.pos.x << '\n'; 
         DrawCircle(
             static_cast<int>(c.pos.x),
             static_cast<int>(c.pos.y),
             1,
-            RED
+            BLUE
         );
         //DrawCircle(c.pos.x,c.pos.y,1000,RED);
         //DrawCircle(500,500,1000,RED);
@@ -78,7 +76,7 @@ void Character::Update(float dt)
         return;
 
 
-    Vector2 target = { path[currentNode].second * 10.0f, path[currentNode].first * 10.0f };
+    Vector2 target = { path[currentNode].second * 10.0f + 5, path[currentNode].first * 10.0f + 5};
     Vector2 dir = Vector2Subtract(target, pos);
     float dist = Vector2Length(dir);
     if (dist < 2.0f) {
@@ -86,8 +84,13 @@ void Character::Update(float dt)
         return;
     }
 
+
+	//speed = 1; // character stat
+    Node& tile = map.GetNodeAtWorld(pos);
+
+    float finalSpeed = 1 / tile.moveCost;
     dir = Vector2Normalize(dir);
-    pos += dir * 60.0f * dt;
+    pos += dir * finalSpeed * dt;
 }
 
 

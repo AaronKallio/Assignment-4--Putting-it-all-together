@@ -30,6 +30,7 @@ public:
 	int previousPath;
     Type type;
 	float speed;
+	char currentItem;
 	
 	void RequestPath(Map& map, Pair target);
     void Update(float dt);

@@ -14,6 +14,12 @@ void FillMap();
 void RunMap();
 int WhichMap();
 
+//enum class ObjectType : char {
+//    Tree = 'T',
+//    Ore  = 'O',
+//    Enemy = 'E'
+//};
+
 enum status {
 	used,
 	unvisited,
@@ -36,10 +42,11 @@ public:
 	float h;
 	std::vector<Object> objects;
 	bool passable;
+	float moveCost;
 	char building;
 	bool discovered;
 	Node(int x, int y, char t, float pI, float pJ, float f1, float g1, float h1)
-		: position{x,y}, type(t), parentI(pI), parentJ(pJ), f(f1), g(g1), h(h1), passable(true), discovered(true){}
+		: position{x,y}, type(t), parentI(pI), parentJ(pJ), f(f1), g(g1), h(h1), passable(true), discovered(false){}
 	void PlaceTrees(int count);
 };
 // Creating a shortcut for int, int pair type
@@ -69,6 +76,7 @@ public:
 
 	bool AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath);
 	const std::vector<Vector2>& GetLastPath() const;
+	Node& GetNodeAtWorld(Vector2 worldPos);
 private:
 	void ConnectNodes();
 	struct AStarNode {
@@ -95,3 +103,4 @@ void RunDFS(int mapNum);
 void RunDijkstra(int mapNum);
 void getDirection(Pair start, Pair end, int dRow[8], int dCol[8]);
 Map GetMap();
+void InitObjectTextures();

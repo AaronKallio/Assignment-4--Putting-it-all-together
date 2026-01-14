@@ -1,7 +1,9 @@
 #include <raylib.h>
 #include "ball.h"
-#include "map.h"
-#include "character.h"
+//#include "map.h"
+//#include "character.h"
+#include "manager.h"
+
 
 int main() 
 {
@@ -10,10 +12,12 @@ int main()
     constexpr int screenWidth = 1000;
     constexpr int screenHeight = 1000;
     InitWindow(screenWidth, screenHeight, "Assignment 4 Aaron Kallio");
-    SetTargetFPS(60);
+    //InitObjectTextures();
+    //SetTargetFPS(120);
     Ball ball;
     FillMap();
     Place();
+    int gameSpeed = 10;
     
     while (!WindowShouldClose())
     {
@@ -21,12 +25,15 @@ int main()
         
         BeginDrawing();
         ClearBackground(BLACK);
-        //ball.Draw();
-        RunMap();
-        DrawRectangle(0,0,10,10,GREEN);
-        RunCharacters();
-        DrawCharacters();
         
+        //ball.Draw();
+        for(int i = 0; i < gameSpeed; i++){
+            RunMap();
+            RunCharacters();
+        }
+        DrawCharacters();
+        int fps = GetFPS();
+        DrawText(TextFormat("FPS: %d", fps), 10, 10, 20, PURPLE);
         EndDrawing();
         
     }

@@ -7,485 +7,14 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <unordered_map>
 using namespace std;
 int pathMode = 0;
 int mode = 1;
 double timed;
 std::vector<Map> maps;
 Map theMap;
-/*
-bool Map::IsValid(int row, int col)
-{
-    return (row >= 0) && (row < width) && (col >= 0)
-        && (col < height);
-}
 
-
-bool Map::IsUnBlocked(int row, int col)
-{
-    if (grid[row][col].type != 'X')
-        return (true);
-    else
-        return (false);
-}
-
-bool Map::IsDestination(int row, int col, Pair dest)
-{
-    if (row == dest.first && col == dest.second)
-        return (true);
-    else
-        return (false);
-}
-
-
-double Map::CalculateHValue(int row, int col, Pair dest)  
-{
-    int dx = abs(row - dest.first);
-    int dy = abs(col - dest.second);
-    return  10* max(dx, dy);  //Chebyshev distance
-
-
-    //return 2 * (abs(row - dest.first) + abs(col - dest.second)); 
-    // Return using the distance formula
-    //return ((double)sqrt(
-     //   (row - dest.first) * (row - dest.first)
-     //   + (col - dest.second) * (col - dest.second)));
-}
-
-void Map::TracePath(Pair dest) //used in a star/dijkstra to draw the shortest path
-{
-    int row = dest.first;
-    int col = dest.second;
-
-    while (!(grid[row][col].parentI == row
-        && grid[row][col].parentJ == col)) {
-        path.push(make_pair(row, col));
-        int temp_row = grid[row][col].parentI;
-        int temp_col = grid[row][col].parentJ;
-        row = temp_row;
-        col = temp_col;
-    }
-
-    path.push(make_pair(row, col));
-    auto tempPath = path;
-    while (!tempPath.empty()) {
-        pair<int, int> p = tempPath.top();
-        tempPath.pop();
-        grid[p.first][p.second].nodeStatus = visited;
-    }
-    return;
-}
-
-void Map::AStarSearch(Pair src, Pair dest)
-{
-    while (!path.empty()) //always empty the path just in case
-        path.pop();
-    
-    // If the source/start is out of range
-    if (IsValid(src.first, src.second) == false) {
-        return;
-    }
-
-    // If the destination/end is out of range
-    if (IsValid(dest.first, dest.second) == false) {
-        return;
-    }
-
-    // Either the source or the destination is blocked
-    if (IsUnBlocked(src.first, src.second) == false || IsUnBlocked(dest.first, dest.second)== false) {
-        return;
-    }
-
-    // If the destination cell is the same as source cell
-    if (IsDestination(src.first, src.second, dest) == true) {
-        return;
-    }
-    
-    //empty closed list to check if node needs to be checked or not
-    std::vector<std::vector<bool>> closedList;
-    closedList.resize(height, std::vector<bool>(width, false));
-    int i, j;
-
-    //undiscovered nodes set to highest possible cost so they are not traversed to prematurely
-    for (i = 0; i < height; i++) {
-        for (j = 0; j < width; j++) {
-            grid[i][j].f = FLT_MAX;
-            grid[i][j].g = FLT_MAX;
-            grid[i][j].h = FLT_MAX;
-            grid[i][j].parentI = -1;
-            grid[i][j].parentJ = -1;
-        }
-    }
-
-    // Initialising the parameters of the starting node
-    i = src.first, j = src.second;
-    grid[i][j].f = 0.0;
-    grid[i][j].g = 0.0;
-    grid[i][j].h = 0.0;
-    grid[i][j].parentI = i;
-    grid[i][j].parentJ = j;
-    set<pPair> openList;
-
-    // Put the starting cell on the open list and set its
-    // 'f' as 0
-    openList.insert(make_pair(0.0, make_pair(i, j)));
-    bool foundDest = false;
-    while (!openList.empty()) {
-        pPair p = *openList.begin();
-
-        // Remove this node from the open list
-        openList.erase(openList.begin());
-
-        // Add this node to the closed list
-        i = p.second.first;
-        j = p.second.second;
-        closedList[i][j] = true;
-        double gNew, hNew, fNew;
-
-        //north
-        if (IsValid(i - 1, j) == true) {
-
-            // If the end found
-            if (IsDestination(i - 1, j, dest) == true) {
-                grid[i - 1][j].parentI = i;
-                grid[i - 1][j].parentJ = j;
-                TracePath(dest);
-                foundDest = true;
-                return;
-            }
-           
-            //if not in closed list and can be accessed
-            else if (closedList[i - 1][j] == false && IsUnBlocked(i - 1, j) == true) {
-                gNew = grid[i][j].g + 1.0;
-                hNew = CalculateHValue(i - 1, j, dest);
-                fNew = gNew + hNew;
-
-                //if not in open list or found a better path
-                if (grid[i - 1][j].f == FLT_MAX || grid[i - 1][j].f > fNew) {
-                    openList.insert(make_pair(fNew, make_pair(i - 1, j)));
-                    grid[i - 1][j].nodeStatus = visited;
-                    grid[i - 1][j].f = fNew;
-                    grid[i - 1][j].g = gNew;
-                    grid[i - 1][j].h = hNew;
-                    grid[i - 1][j].parentI = i;  //used to reconstruct path
-                    grid[i - 1][j].parentJ = j;
-                }
-            }
-        }
-
-        //south
-        if (IsValid(i + 1, j) == true) {
-           
-            // If the end found
-            if (IsDestination(i + 1, j, dest) == true) {
-                grid[i + 1][j].parentI = i;
-                grid[i + 1][j].parentJ = j;
-                TracePath(dest);
-                foundDest = true;
-                return;
-            }
-          
-            //if not in closed list and can be accessed
-            else if (closedList[i + 1][j] == false&& IsUnBlocked(i + 1, j) == true) {
-                gNew = grid[i][j].g + 1.0;
-                hNew = CalculateHValue(i + 1, j, dest);
-                fNew = gNew + hNew;
-                //if not in open list or found a better path
-                if (grid[i + 1][j].f == FLT_MAX || grid[i + 1][j].f > fNew) {
-                    openList.insert(make_pair(fNew, make_pair(i + 1, j)));
-                    grid[i + 1][j].nodeStatus = visited;
-                    grid[i + 1][j].f = fNew;
-                    grid[i + 1][j].g = gNew;
-                    grid[i + 1][j].h = hNew;
-                    grid[i + 1][j].parentI = i;//used to reconstruct path
-                    grid[i + 1][j].parentJ = j;
-                }
-            }
-        }
-
-        //east
-        if (IsValid(i, j + 1) == true) {
-            // If the end found
-            if (IsDestination(i, j + 1, dest) == true) {
-                // Set the Parent of the destination cell
-                grid[i][j + 1].parentI = i;
-                grid[i][j + 1].parentJ = j;
-                TracePath(dest);
-                foundDest = true;
-                return;
-            }
-
-            //if not in closed list and can be accessed
-            else if (closedList[i][j + 1] == false && IsUnBlocked(i, j + 1)== true) {
-                gNew = grid[i][j].g + 1.0;
-                hNew = CalculateHValue(i, j + 1, dest);
-                fNew = gNew + hNew;
-                //if not in open list or found a better path
-                if (grid[i][j + 1].f == FLT_MAX || grid[i][j + 1].f > fNew) {
-                    openList.insert(make_pair(fNew, make_pair(i, j + 1)));
-                    grid[i][j + 1].nodeStatus = visited;
-                    grid[i][j + 1].f = fNew;
-                    grid[i][j + 1].g = gNew;
-                    grid[i][j + 1].h = hNew;
-                    grid[i][j + 1].parentI = i;//used to reconstruct path
-                    grid[i][j + 1].parentJ = j;
-                }
-            }
-        }
-
-        //west
-        if (IsValid(i, j - 1) == true) {
-            // If the end found
-            if (IsDestination(i, j - 1, dest) == true) {
-                grid[i][j - 1].parentI = i;
-                grid[i][j - 1].parentJ = j;
-                TracePath(dest);
-                foundDest = true;
-                return;
-            }
-            //if not in closed list and can be accessed
-            else if (closedList[i][j - 1] == false&& IsUnBlocked(i, j - 1) == true) {
-                gNew = grid[i][j].g + 1.0;
-                hNew = CalculateHValue(i, j - 1, dest);
-                fNew = gNew + hNew;
-                //if not in open list or found a better path
-                if (grid[i][j - 1].f == FLT_MAX || grid[i][j - 1].f > fNew) {
-                    openList.insert(make_pair(fNew, make_pair(i, j - 1)));
-                    grid[i][j - 1].nodeStatus = visited;
-                    grid[i][j - 1].f = fNew;
-                    grid[i][j - 1].g = gNew;
-                    grid[i][j - 1].h = hNew;
-                    grid[i][j - 1].parentI = i;//used to reconstruct path
-                    grid[i][j - 1].parentJ = j;
-                }
-            }
-        }
-
-        //south west
-        if (IsValid(i - 1, j -1 ) == true&& grid[i - 1][j].type!='X'&& grid[i][j-1].type != 'X') {
-            // If the end found
-            if (IsDestination(i - 1, j - 1, dest) == true) {
-                grid[i - 1][j - 1].parentI = i;
-                grid[i - 1][j - 1].parentJ = j;
-                TracePath(dest);
-                foundDest = true;
-                return;
-            }
-            //if not in closed list and can be accessed
-            else if (closedList[i - 1][j - 1] == false&& IsUnBlocked(i - 1, j - 1) == true) {
-                gNew = grid[i][j].g + 1;
-                hNew = CalculateHValue(i - 1, j - 1, dest);
-                fNew = gNew + hNew;
-                //if not in open list or found a better path
-                if (grid[i - 1][j - 1].f == FLT_MAX|| grid[i - 1][j - 1].f > fNew) {
-                    openList.insert(make_pair(fNew, make_pair(i - 1, j - 1)));
-                    grid[i - 1][j - 1].nodeStatus = visited;
-                    grid[i - 1][j - 1].f = fNew;
-                    grid[i - 1][j - 1].g = gNew;
-                    grid[i - 1][j - 1].h = hNew;
-                    grid[i - 1][j - 1].parentI = i;//used to reconstruct path
-                    grid[i - 1][j - 1].parentJ = j;
-                }
-            }
-        }
-        //north east
-        if (IsValid(i - 1, j +1 ) == true&& grid[i - 1][j].type!='X'&& grid[i][j+1].type != 'X') {
-            // If the end found
-            if (IsDestination(i - 1, j + 1, dest) == true) {
-                // Set the Parent of the destination cell
-                grid[i - 1][j + 1].parentI = i;
-                grid[i - 1][j + 1].parentJ = j;
-                TracePath(dest);
-                foundDest = true;
-                return;
-            }
-            //if not in closed list and can be accessed
-            else if (closedList[i - 1][j + 1] == false&& IsUnBlocked(i - 1, j + 1) == true) {
-                gNew = grid[i][j].g + 1;
-                hNew = CalculateHValue(i - 1, j+1, dest);
-                fNew = gNew + hNew;
-                //if not in open list or found a better path
-                if (grid[i - 1][j + 1].f == FLT_MAX|| grid[i - 1][j + 1].f > fNew) {
-                    openList.insert(make_pair(fNew, make_pair(i - 1, j + 1)));
-                    grid[i - 1][j + 1].nodeStatus = visited;
-                    grid[i - 1][j + 1].f = fNew;
-                    grid[i - 1][j + 1].g = gNew;
-                    grid[i - 1][j + 1].h = hNew;
-                    grid[i - 1][j + 1].parentI = i;//used to reconstruct path
-                    grid[i - 1][j + 1].parentJ = j;
-                }
-            }
-        }
-        //south east
-        if (IsValid(i + 1, j + 1) == true && grid[i + 1][j].type != 'X' && grid[i][j + 1].type != 'X') {
-            // If the end found
-            if (IsDestination(i + 1, j + 1, dest) == true) {
-                grid[i + 1][j + 1].parentI = i;
-                grid[i + 1][j + 1].parentJ = j;
-                TracePath(dest);
-                foundDest = true;
-                return;
-            }
-            //if not in closed list and can be accessed
-            else if (closedList[i + 1][j + 1] == false&& IsUnBlocked(i + 1, j + 1) == true) {
-                gNew = grid[i][j].g + 1;
-                hNew = CalculateHValue(i + 1, j+1, dest);
-                fNew = gNew + hNew;
-                //if not in open list or found a better path
-                if (grid[i + 1][j + 1].f == FLT_MAX|| grid[i + 1][j + 1].f > fNew) {
-                    openList.insert(make_pair(fNew, make_pair(i + 1, j + 1)));
-                    grid[i + 1][j + 1].nodeStatus = visited;
-                    // Update the details of this cell
-                    grid[i + 1][j + 1].f = fNew;
-                    grid[i + 1][j + 1].g = gNew;
-                    grid[i + 1][j + 1].h = hNew;
-                    grid[i + 1][j + 1].parentI = i;//used to reconstruct path
-                    grid[i + 1][j + 1].parentJ = j;
-                }
-            }
-        }
-
-
-        //north west
-        if (IsValid(i -1, j -1) == true && grid[i - 1][j].type != 'X' && grid[i][j - 1].type != 'X') {
-            // If the end found
-            if (IsDestination(i - 1, j - 1, dest) == true) {
-                grid[i - 1][j - 1].parentI = i;
-                grid[i - 1][j - 1].parentJ = j;
-                TracePath(dest);
-                foundDest = true;
-                return;
-            }
-            //if not in closed list and can be accessed
-            else if (closedList[i - 1][j - 1] == false&& IsUnBlocked(i - 1, j - 1) == true) {
-                gNew = grid[i][j].g + 1;
-                hNew = CalculateHValue(i - 1, j - 1, dest);
-                fNew = gNew + hNew;
-                //if not in open list or found a better path
-                if (grid[i - 1][j - 1].f == FLT_MAX|| grid[i - 1][j - 1].f > fNew) {
-                    openList.insert(make_pair(fNew, make_pair(i - 1, j - 1)));
-                    grid[i - 1][j - 1].nodeStatus = visited;
-                    grid[i - 1][j - 1].f = fNew;
-                    grid[i - 1][j - 1].g = gNew;
-                    grid[i - 1][j - 1].h = hNew;
-                    grid[i - 1][j - 1].parentI = i;//used to reconstruct path
-                    grid[i - 1][j - 1].parentJ = j;
-                }
-            }
-        }
-    }
-
-    
-    if (foundDest == false)
-        //DrawDebugText({20,10}, "not found");
-
-    return;
-}
-
-void RunAStar(int mapNum)
-{
-    Pair src = make_pair(1, 1);
-    Pair dest = make_pair(maps[mapNum].height - 2, maps[mapNum].width - 2);
-   maps[mapNum].AStarSearch(src, dest);
-
-}
-
-void RunBFS(int mapNum)
-{
-    Pair src = make_pair(1, 1);
-    Pair dest = make_pair(maps[mapNum].height - 2, maps[mapNum].width - 2);
-    maps[mapNum].BFS(src, dest);
-
-}
-
-void ResetMap(int mapNum) {  //resets all nodes when changing maps
-    for (int y = 0; y < maps[mapNum].height; ++y) {
-        for (int x = 0; x < maps[mapNum].width; ++x) {
-            maps[mapNum].grid[y][x].nodeStatus = unvisited;
-            while (!maps[mapNum].path.empty())
-                maps[mapNum].path.pop();
-        }
-    }
-}
-*/
-
-//int WhichMap() {
-	//if (Play::KeyPressed(Play::KEY_1)) {
-	//	mode = 1;
-	//}
-	//else if (Play::KeyPressed(Play::KEY_2)) {
-	//	mode = 2;
-	//}
-	//else if (Play::KeyPressed(Play::KEY_3)) {
-	//	mode = 3;
-	//}
-	//return mode;
-//}
-
-//int WhichPathFinding() {
-    //int funcPathNode = 0;
-    //if (Play::KeyPressed(Play::KEY_4)) {
-    //   funcPathNode = 4;
-    //}
-    //else if (Play::KeyPressed(Play::KEY_5)) {
-     //   funcPathNode = 5;
-    //}
-    //else if (Play::KeyPressed(Play::KEY_6)) {
-    //    funcPathNode = 6;
-    //}
-    //else if (Play::KeyPressed(Play::KEY_7)) {
-     //   funcPathNode = 7;
-    //}
-    //return funcPathNode;
-//}
-
-/*
-void RunPathFinding(int mapNum) {  
-    int temp = WhichPathFinding();
-    std::string elapsedStr = std::to_string(timed) + "ms";
-    const char* cstr = elapsedStr.c_str();
-    //DrawDebugText({455,850},cstr, cRed);
-    if (pathMode ==temp) {
-        return;
-    }
-    for (int i = 0; i < 3;i++) {
-        ResetMap(i);
-    }
-    if (temp == 4) {
-        std::chrono::duration<double> timer;
-        auto start = std::chrono::high_resolution_clock::now();
-        RunAStar(mapNum);
-        auto end = std::chrono::high_resolution_clock::now();
-        timer = end - start;
-        timed = timer.count();
-    }
-    if (temp == 5) {
-        std::chrono::duration<double> timer;
-        auto start = std::chrono::high_resolution_clock::now();
-        RunBFS(mapNum);
-        auto end = std::chrono::high_resolution_clock::now();
-        timer = end - start;
-        timed = timer.count();
-    }
-    if (temp == 6) {
-        std::chrono::duration<double> timer;
-        auto start = std::chrono::high_resolution_clock::now();
-        RunDFS(mapNum);
-        auto end = std::chrono::high_resolution_clock::now();
-        timer = end - start;
-        timed = timer.count();
-    }
-    if (temp == 7) {
-        std::chrono::duration<double> timer;
-        auto start = std::chrono::high_resolution_clock::now();
-        RunDijkstra(mapNum);
-        auto end = std::chrono::high_resolution_clock::now();
-        timer = end - start;
-        timed = timer.count();
-    }
-}
-
-*/
 
 namespace {
     const int dRow[8] = {-1, 1, 0, 0, -1, -1, 1, 1};
@@ -496,6 +25,15 @@ namespace {
         14, 14, 14, 14
     };
 }
+
+
+
+
+
+
+
+
+
 
 void FillMap(){
 	theMap.MapFill("src/MapSimulation.txt");
@@ -549,37 +87,49 @@ void Map::MapFill(const std::string& fileName) {
 }
 
 void Map::ConnectNodes() {
+    
+    for (int y = 95; y < 98; ++y) {
+        for (int x = 2; x < 5; ++x) {
+            Node& current = grid[y][x];
+            current.discovered = true;
+        }
+    }
+
     for (int y = 0; y < grid.size(); ++y) {
         for (int x = 0; x < grid[y].size(); ++x) {
 
             Node& current = grid[y][x];
             current.position = { x * 10.0f, y * 10.0f };
 
-            if (current.type == 'B') continue;
-            if (current.type == 'T') current.PlaceTrees(5);
-            if (current.type == 'V'||current.type == 'B') current.passable = false;
+            switch (current.type) {
+            case 'T': current.moveCost = 1.0f, current.PlaceTrees(5); break; 
+            case 'M': current.moveCost = 1.0f; break;
+            case 'G': current.moveCost = 2.0f; break;
+            case 'B': current.passable = false; break;
+            case 'V': current.passable = false; break;
+            }
+            //if (current.type == 'B') continue;
+            //if (current.type == 'T') current.PlaceTrees(5);
+            //if (current.type == 'V'||current.type == 'B') current.passable = false;
 
             // up
-            if (y > 0 && x < grid[y - 1].size() && grid[y - 1][x].type != 'B') {
-                current.connectedNodes.push_back(&grid[y - 1][x]);
-            }
-
-            if (y + 1 < grid.size() && x < grid[y + 1].size() && grid[y + 1][x].type != 'B') {
-                current.connectedNodes.push_back(&grid[y + 1][x]);
-            }
-
-            // left
-            if (x > 0 && grid[y][x - 1].type != 'B') {
-                current.connectedNodes.push_back(&grid[y][x - 1]);
-            }
-
-            // right
-            if (x + 1 < grid[y].size() && grid[y][x + 1].type != 'B') {
-                current.connectedNodes.push_back(&grid[y][x + 1]);
-            }
+            
+        }
+    }
+    int oreCount = 0;
+    while(oreCount<=60){
+        int y = GetRandomValue(1,98);
+        int x = GetRandomValue(1,98);
+        Node& current = grid[y][x];
+        if(current.discovered == false&&current.passable==true){
+            current.objects.push_back({'O', {GetRandomValue(0,9), GetRandomValue(0,9)}});
+            cout<<oreCount;
+            oreCount++;
+            
         }
     }
 }
+
 
 void Map::DrawMap() {
     //cout << "bob" << endl;
@@ -587,59 +137,116 @@ void Map::DrawMap() {
     for (int x = 0; x < grid[y].size(); ++x) {
         Node& current = grid[y][x];
             //out << current.type << endl;
-			Vector2 bottomLeft = current.position;
-			Vector2 topRight = { current.position.x + 10,current.position.y + 10 };
-			char tempType = current.type;
-            if (current.discovered == false) {
+		
+		char tempType = current.type;
+        //if (current.discovered == false) {
+        //    DrawRectangle(current.position.x,current.position.y,10,10,BLACK);
+		//}
+		if (tempType == 'T') {
 				//DrawRect(bottomLeft, topRight, cWhite, true);
-                DrawRectangle(current.position.x,current.position.y,10,10,BLACK);
-			}
-			else if (tempType == 'T') {
-				//DrawRect(bottomLeft, topRight, cWhite, true);
-                DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
-			}
-			else if (tempType == 'V') {
-                DrawRectangle(current.position.x,current.position.y,10,10,BLUE);
-			}
-			else if (tempType == 'G') {
+            DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
+		}
+		else if (tempType == 'V') {
+            DrawRectangle(current.position.x,current.position.y,10,10,BLUE);
+		}
+		else if (tempType == 'G') {
 				//DrawRect(bottomLeft, topRight, cYellow, true);
-                DrawRectangle(current.position.x,current.position.y,10,10,BROWN);
-			}
-			else if (tempType == 'B') {
+            DrawRectangle(current.position.x,current.position.y,10,10,BROWN);
+		}
+		else if (tempType == 'B') {
 				//DrawRect(bottomLeft, topRight, cGreen, true);
-                DrawRectangle(current.position.x,current.position.y,10,10,GRAY);
-
-			}
-            else if (tempType == 'M') {
-				//DrawRect(bottomLeft, topRight, cGreen, true);
-                DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
-			}
-            for(int j = 0;j < current.objects.size();j++){
-                if(current.objects[j].first == 'T' &&current.discovered == true){
-                    DrawPixel(current.position.x + current.objects[j].second.first,current.position.y + current.objects[j].second.second,DARKGREEN);
-                }
-            }
+            DrawRectangle(current.position.x,current.position.y,10,10,GRAY);
 
 		}
+        else if (tempType == 'M') {
+				//DrawRect(bottomLeft, topRight, cGreen, true);
+            DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
+		}
+
+        for(int j = 0;j < current.objects.size();j++){
+            if(current.objects[j].first == 'T'){// &&current.discovered == true){
+                //DrawCircle(
+                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
+                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
+                //    1,
+                //    DARKGREEN);
+                DrawPixel(current.position.x + current.objects[j].second.first,current.position.y + current.objects[j].second.second,DARKGREEN);
+            }
+            else if(current.objects[j].first == 'O'){// &&current.discovered == true){
+                DrawPixel(current.position.x + current.objects[j].second.first,current.position.y + current.objects[j].second.second,RED);
+                //DrawCircle(
+                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
+                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
+                //    1,
+                //    RED);
+            }
+        }
+
+        //DrawLine(current.position.x,current.position.y,current.position.x,current.position.y+10,GRAY);
+        //DrawLine(current.position.x,current.position.y,current.position.x+10,current.position.y,GRAY);
+		}
 	}
-    //if (path.empty()) return;
-
-    //auto tempPath = path;
-
-    //Pair endPoint = tempPath.top();
-    //tempPath.pop();
-
-    //while (!tempPath.empty()) {
-        //Pair startPoint = tempPath.top();
-        //tempPath.pop();
-
-        // Convert grid coordinates to screen coordinates
-        //Vector2 p1 = { startPoint.second * 10, startPoint.first * 10 };
-        //Vector2 p2 = { endPoint.second * 10, endPoint.first * 10 };
-        //DrawLine(p1, p2, cGreen);
-
-        //endPoint = startPoint; // move to next segment
+        
     }
+
+/*
+void Map::DrawMap()
+{
+    for (int y = 0; y < grid.size(); ++y) {
+        for (int x = 0; x < grid[y].size(); ++x) {
+
+            Node& current = grid[y][x];
+
+            // ---- TILE ----
+            Color tileColor = BLACK;
+            switch (current.type) {
+                case 'T': tileColor = GREEN; break;
+                case 'V': tileColor = BLUE;  break;
+                case 'G': tileColor = BROWN; break;
+                case 'B': tileColor = GRAY;  break;
+                case 'M': tileColor = GREEN; break;
+                default: break;
+            }
+
+            DrawRectangle(
+                current.position.x,
+                current.position.y,
+                10,
+                10,
+                tileColor
+            );
+
+            // ---- OBJECTS ----
+            for (const auto& obj : current.objects) {
+                char type = obj.first;
+
+                auto it = objectTextures.find(type);
+                if (it == objectTextures.end())
+                    continue;
+
+                const Texture2D& tex = it->second;
+
+                switch(type){
+                    case 'T':
+                    DrawPixel(
+                    current.position.x + obj.second.first,
+                    current.position.y + obj.second.second,
+                    DARKGREEN
+                );
+                }
+                //DrawTexture(
+                //    tex,
+                //    current.position.x + obj.second.first,
+                //    current.position.y + obj.second.second,
+                //    WHITE
+                //);
+            }
+        }
+    }
+}
+*/
+
+
 
 
 void Node::PlaceTrees(int count) {
@@ -680,6 +287,7 @@ bool Map::IsValid(int row, int col) const
 
 bool Map::IsWalkable(int row, int col) const
 {
+
     if(grid[row][col].type == 'V' || grid[row][col].type == 'B'){
         return false;
     }
@@ -751,7 +359,7 @@ bool Map::AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath)
         for (int i = 0; i < 8; i++) {
             int nr = r + dRow[i];
             int nc = c + dCol[i];
-
+            
             if (!IsValid(nr, nc) || closed[nr][nc])
                 continue;
 
@@ -764,7 +372,9 @@ bool Map::AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath)
             if (!IsWalkable(nr, nc))
                 continue;
 
-            float gNew = nodes[r][c].g + moveCost[i];
+            float tileCost = grid[nr][nc].moveCost;
+            float gNew = nodes[r][c].g + moveCost[i] * tileCost;
+            //float gNew = nodes[r][c].g + moveCost[i];
             auto& neighbor = nodes[nr][nc];
 
             if (gNew < neighbor.g) {
@@ -794,7 +404,12 @@ Map GetMap(){
 }
 
 
-
+Node& Map::GetNodeAtWorld(Vector2 worldPos)
+{
+    int col = int(worldPos.x / 10);
+    int row = int(worldPos.y / 10);
+    return grid[row][col];
+}
 
 
 

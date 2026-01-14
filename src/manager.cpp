@@ -1,0 +1,15 @@
+#include "manager.h"
+int felledTree;
+int coal;
+int ironBar;
+int sword;
+int soldiers;
+int workers;
+int scouts;
+int builders;
+int craftsmen;
+int ironOre;
+int coalMine;
+int armsmith;
+int smelter;
+int trainingCamp;
