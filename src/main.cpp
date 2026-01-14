@@ -17,7 +17,8 @@ int main()
     Ball ball;
     FillMap();
     Place();
-    int gameSpeed = 10;
+    SetTask();
+    int gameSpeed = 20;
     
     while (!WindowShouldClose())
     {
@@ -30,6 +31,7 @@ int main()
         for(int i = 0; i < gameSpeed; i++){
             RunMap();
             RunCharacters();
+            RunTask();
         }
         DrawCharacters();
         int fps = GetFPS();

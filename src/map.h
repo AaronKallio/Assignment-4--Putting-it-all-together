@@ -61,18 +61,11 @@ public:
 	Map();
 	~Map();
 	void BFS(Pair start, Pair end);
-	//bool IsValid(int row, int col);
-	//bool IsUnBlocked(int row, int col);
-	//bool IsDestination(int row, int col, Pair dest);
-	//double CalculateHValue(int row, int col, Pair dest);
-	//void TracePath(Pair dest);
-	//void AStarSearch(Pair src, Pair dest);
 	void DFS(Pair start, Pair end);
 	void Dijkstra(Pair src, Pair dest);
 	void PlaceTrees(int count);
-	//bool IsValid(int row, int col) const;
-	//bool IsWalkable(int row, int col) const;
-	//float Heuristic(int row, int col, Pair dest) const;
+
+	void RemoveTree(int y, int x);
 
 	bool AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath);
 	const std::vector<Vector2>& GetLastPath() const;

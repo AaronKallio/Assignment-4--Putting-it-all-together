@@ -1,5 +1,5 @@
 #include "manager.h"
-int felledTree;
+//int felledTree;
 int coal;
 int ironBar;
 int sword;
