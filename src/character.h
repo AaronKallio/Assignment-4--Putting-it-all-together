@@ -248,7 +248,7 @@ public:
     void Update(float dt);
 	Character();
 	void FSM();
-	Pair TreeSearch(Map& m);
+	//Pair TreeSearch(Map& m);
 
 private:
 	
@@ -300,6 +300,7 @@ public:
 	//c->currentPathIndex < 0 || c->currentPathIndex >= (int)c->path.size()|| 
     if (distTest <=2.5f) {
         pathRequested = false;
+		cout<<"what t"<<'\n';
         return success;
     }
 
@@ -438,14 +439,14 @@ public:
     c->pos.y += dir.y * c->speed * GetFrameTime();
 	std::string elapsedStr = to_string(c->currentPathIndex);
 	const char* cstr = elapsedStr.c_str();
-	DrawText(cstr,500,500,50,PURPLE);
+	//DrawText(cstr,500,500,50,PURPLE);
     return running;
 	}
 };
 
 
 
-class DespositTask : public Task {
+class DepositTask : public Task {
 private:
     Character* c;
     //Pair dest;
@@ -453,15 +454,23 @@ private:
 	ObjectType item;
 
 public:
-    DespositTask(Character* character, Map* m, ObjectType it)
+    DepositTask(Character* character, Map* m, ObjectType it)
         : c(character),  map(m), item(it) {}
 
-    behaviour Run() override{
-		if(c->currentItem==item){
-			c->currentItem==ObjectType::None;
-			map->AddObject((float)c->pos.y,(float)c->pos.x,ObjectType::ChoppedTree);
-			return success;
-		}
-		return failure;
-	}
+    behaviour Run() override {
+    if (c->currentItem == item) {
+
+        c->currentItem = ObjectType::None;
+
+        int row = static_cast<int>(c->pos.y / 10);
+        int col = static_cast<int>(c->pos.x / 10);
+
+        map->AddObject(row, col, ObjectType::ChoppedTree);
+
+        cout << "deposit success\n";
+        return success;
+    }
+
+    return failure;
+}
 };

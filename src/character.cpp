@@ -100,10 +100,6 @@ void Character::Update(float dt)
     pos += dir * finalSpeed * dt;
 }
 
-Pair Character::TreeSearch(Map& m){
-
-}
-
 Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 {
 	Selector* root = new Selector();
@@ -112,7 +108,7 @@ Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
     chopSequence -> AddChild(new FindTreeTask(c,m)); 
 	chopSequence -> AddChild(new ChopTask(c,m)); 
     chopSequence -> AddChild(new TravelTask(c,destination,m)); 
-    chopSequence -> AddChild(new DespositTask(c,m,ObjectType::ChoppedTree)); 
+    chopSequence -> AddChild(new DepositTask(c,m,ObjectType::ChoppedTree)); 
 	//Task* work = BuildFactoryTree(c);
 
 	root->AddChild(chopSequence);

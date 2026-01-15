@@ -467,10 +467,10 @@ bool Map::NodeHasObject(int row, int col, ObjectType type){
 
 void Map::AddObject(int row, int col, ObjectType type){
     //WorldObject insertObj;
-    WorldObject insertObj ={
-                ObjectType::ChoppedTree,
-                Vector2{(float)GetRandomValue(0, 9),(float)GetRandomValue(0, 9)},
-                false};
+    WorldObject insertObj = {
+    type,
+    Vector2{ (float)GetRandomValue(0,9), (float)GetRandomValue(0,9) },
+    false};
     grid[row][col].objects.emplace_back(insertObj);
 
 }
