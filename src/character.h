@@ -242,6 +242,7 @@ public:
 	int currentPathIndex;
 	Task* behaviourTree = nullptr;
 	DecisionTreeNode* decisionState;
+	int characterNum;
 
 
 	void RequestPath(Map& map, Pair target);
@@ -305,7 +306,7 @@ public:
     }
 
     Pair next = c->path[c->currentPathIndex];
-
+	
     Vector2 target{
         next.second * 10.0f + 5.0f,
         next.first  * 10.0f + 5.0f
@@ -361,13 +362,12 @@ public:
         elapsed = 0.0f; // reset for next use
 		//DrawText("rdgggggggggggggggggggg",500,500,50,BLACK);
 		c->currentItem = ObjectType::ChoppedTree;
-		map->RemoveTree(static_cast<int>(c->pos.y / 10),static_cast<int>(c->pos.x / 10));
+		map->RemoveTree(static_cast<int>(c->pos.y / 10),static_cast<int>(c->pos.x / 10),c->characterNum);
 		//c->pos = {0,0};
 		//cout<<"idk man";
         return success;
     }
 };
-
 
 
 class FindTreeTask : public Task {
@@ -393,8 +393,8 @@ public:
         c->path.clear();
         c->currentPathIndex = 0;
 
-        found = map->BFS(start, ObjectType::Tree, c->path);
-
+        found = map->BFS(start, ObjectType::Tree, c->path,c->characterNum);
+		
 
         if (found == notFound || c->path.empty()) {
             pathRequested = false;

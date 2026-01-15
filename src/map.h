@@ -36,7 +36,7 @@ enum class ObjectType {
 struct WorldObject {
     ObjectType type;
     Vector2 localPos; 
-    bool locked = false;
+    int locked = -1;
 };
 
 // Creating a shortcut for pair<int, pair<int, int>> type
@@ -78,25 +78,24 @@ public:
 	//void Dijkstra(Pair src, Pair dest);
 	void PlaceTrees(int count);
 
-	void RemoveTree(int y, int x);
-
+	void RemoveTree(int y, int x,int characterNum);
+	//bool LockObjectAt(int row, int col, ObjectType type, int characterNum);
 	bool AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath);
 	const std::vector<Vector2>& GetLastPath() const;
 	Node& GetNodeAtWorld(Vector2 worldPos);
 
-	Pair BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath);
-	bool NodeHasObject(int row, int col, ObjectType type);
+	Pair BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath, int characterNum);
+	bool NodeHasObject(int row, int col, ObjectType type,int characterNum);
 	void AddObject(int row, int col, ObjectType type);
 private:
 	void ConnectNodes();
 	struct AStarNode {
-        float f = FLT_MAX;
-        float g = FLT_MAX;
-        float h = FLT_MAX;
-        int parentRow = -1;
-        int parentCol = -1;
-    };
-
+    float g = FLT_MAX;
+    float h = 0.0f;
+    float f = FLT_MAX;
+    int parentRow = -1;
+    int parentCol = -1;
+};
     bool IsValid(int row, int col) const;
     bool IsWalkable(int row, int col) const;
     float Heuristic(int row, int col, Pair dest) const;

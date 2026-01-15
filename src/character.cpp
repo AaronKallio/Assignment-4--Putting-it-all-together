@@ -5,30 +5,38 @@ using namespace std;
 std::vector<Character> characters;
 //Map map;
 Map& map = GetMap();
-Character::Character()
-    : pos{0.0f, 0.0f},
-      velocity{0.0f, 0.0f},
-      rotation(5.0f),
-      active(false),
-      wanderTarget{12.5f, 12.5f},
-      collisionTimer(0),
-      collisionVector{0.0f, 0.0f},
-      previousPath(-1),
-      type(worker)
-{
+Character::Character(){
+    pos = { 50, 50 };
+    velocity = { 0, 0 };
+    rotation = 0.0f;
+
+    active = true;
+    speed = 60.0f;
+
+    state = cutTree;
+    type = worker;
+
+    currentItem = ObjectType::None;
+
+    currentPathIndex = 0;
+    currentNode = 0;
+
+    behaviourTree = nullptr;
+    decisionState = nullptr;
 }
 
 void Place(){
 	//map = GetMap();
-    constexpr size_t CHARACTER_COUNT = 1;
+    constexpr size_t CHARACTER_COUNT = 50;
     characters.clear();
     characters.reserve(CHARACTER_COUNT);
     for (size_t i = 0; i < CHARACTER_COUNT; ++i) {
         Character c;
         //c.pos = {(float)i * 3 +15, 980.0f};
+        c.characterNum = i;
 		c.pos = {(float)i * 0.5f +22.5f, 975.0f};
         characters.emplace_back(c);
-		characters[i].RequestPath(map,{c.pos.x,c.pos.y});
+		characters[i].RequestPath(map,{10,98});
     }
     //for (size_t j = 0; j < CHARACTER_COUNT/2; ++j) {
     //    Character c;
@@ -105,11 +113,13 @@ Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 	Selector* root = new Selector();
 	Sequence* chopSequence = new Sequence();
 	//chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+
+
     chopSequence -> AddChild(new FindTreeTask(c,m)); 
 	chopSequence -> AddChild(new ChopTask(c,m)); 
     chopSequence -> AddChild(new TravelTask(c,destination,m)); 
     chopSequence -> AddChild(new DepositTask(c,m,ObjectType::ChoppedTree)); 
-	//Task* work = BuildFactoryTree(c);
+	
 
 	root->AddChild(chopSequence);
 	//root->AddChild(work);
@@ -119,7 +129,7 @@ Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 
 
 void SetTask(){
-	characters[0].behaviourTree = BuildCutTreeTree(&characters[0],{95,4},&map);
+	characters[0].behaviourTree = BuildCutTreeTree(&characters[0],{97,4},&map);
 }
 
 void RunTask(){

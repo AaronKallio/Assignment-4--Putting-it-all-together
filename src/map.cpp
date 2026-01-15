@@ -108,7 +108,7 @@ void Map::ConnectNodes() {
             current.objects.push_back({
                 ObjectType::Ore,
                 Vector2{(float)GetRandomValue(0, 9),(float)GetRandomValue(0, 9)},
-                false});
+                -1});
             cout<<oreCount;
             oreCount++;
             
@@ -155,6 +155,7 @@ void Map::DrawMap() {
                 //    1,
                 //    DARKGREEN);
                 DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKGREEN);
+                cout<<current.objects[j].locked<<'\n';
             }
             else if(current.objects[j].type == ObjectType::Ore &&current.discovered == true){
                 DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,RED);
@@ -172,6 +173,7 @@ void Map::DrawMap() {
                 //    1,
                 //    RED);
             }
+            //cout<<"--------------"<<'\n';
         }
 		}
 	}
@@ -184,7 +186,7 @@ void Node::PlaceTrees(int count) {
     objects.push_back({
                 ObjectType::Tree,
                 Vector2{(float)GetRandomValue(0, 9),(float)GetRandomValue(0, 9)},
-                false});
+                -1});
 
     for (int i = 1; i < count; i++) {
         bool foundSpot = false;
@@ -206,7 +208,7 @@ void Node::PlaceTrees(int count) {
                 objects.push_back({
                 ObjectType::Tree,
                 Vector2{(float)randomX,(float)randomY},
-                false});
+                -1});
                 foundSpot = true;
             }
         }
@@ -341,11 +343,11 @@ Node& Map::GetNodeAtWorld(Vector2 worldPos){
     return grid[row][col];
 }
 
-void Map::RemoveTree(int y, int x){
+void Map::RemoveTree(int y, int x,int characterNum){
     DrawRectangle(10,10,1000,1000,BLACK);
     for(int i = 0; i < grid[y][x].objects.size();i++){ 
         
-        if(grid[y][x].objects[i].type==ObjectType::Tree&&grid[y][x].objects[i].locked==false){ 
+        if(grid[y][x].objects[i].type==ObjectType::Tree&&grid[y][x].objects[i].locked==characterNum){ 
             grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
             cout<<"idddddddddddddddddddk man"<<'\n';
             //std::string elapsedStr1 = to_string(grid[y][x].position.y);
@@ -354,7 +356,7 @@ void Map::RemoveTree(int y, int x){
             cout<<grid[y][x].position.y<<'\n';
             cout<<grid[y][x].position.x<<'\n';
 
-            DrawRectangle(grid[y][x].position.x,grid[y][x].position.y,10,10,GRAY);
+            //DrawRectangle(grid[y][x].position.x,grid[y][x].position.y,10,10,GRAY);
             return; 
         } 
         //cout<<grid[y][x].objects[i].first<<'\n';
@@ -364,7 +366,7 @@ void Map::RemoveTree(int y, int x){
     }
 
 
-Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath){
+Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath, int characterNum){
     outPath.clear();
 
     if (!IsValid(start.first, start.second))
@@ -398,7 +400,7 @@ Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath){
         int c = current.second;
 
 
-        if (grid[r][c].discovered&&NodeHasObject(r, c, theObject)) {
+        if (grid[r][c].discovered&&NodeHasObject(r, c, theObject, characterNum)) {
             found = current;
             break;
         }
@@ -454,23 +456,25 @@ Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath){
     return found;
 }
 
-bool Map::NodeHasObject(int row, int col, ObjectType type){
+bool Map::NodeHasObject(int row, int col, ObjectType type,int characterNum){//, int characterNum){
     //for (const WorldObject& obj : grid[row][col].objects) {
     for(int i = 0; i < grid[row][col].objects.size();i++){
-        if (grid[row][col].objects[i].type == type&&grid[row][col].objects[i].locked == false){
-            grid[row][col].objects[i].locked = true;
+        if (grid[row][col].objects[i].type == type&&(grid[row][col].objects[i].locked == -1)){//||grid[row][col].objects[i].locked == characterNum)){
+            grid[row][col].objects[i].locked = characterNum;
             return true;
         }
     }
     return false;
 }
 
+
+
 void Map::AddObject(int row, int col, ObjectType type){
     //WorldObject insertObj;
     WorldObject insertObj = {
     type,
     Vector2{ (float)GetRandomValue(0,9), (float)GetRandomValue(0,9) },
-    false};
+    -1};
     grid[row][col].objects.emplace_back(insertObj);
 
 }
