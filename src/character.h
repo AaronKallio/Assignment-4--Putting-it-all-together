@@ -18,6 +18,8 @@ enum behaviour {
 	failure,
 	running
 };
+
+
 class BTNode {
 public:
 	virtual behaviour Tick() = 0;
@@ -234,7 +236,7 @@ public:
 	int previousPath;
     Type type;
 	float speed;
-	char currentItem;
+	ObjectType currentItem;
 	std::vector<Pair> path;
     size_t currentNode = 0;
 	int currentPathIndex;
@@ -246,6 +248,7 @@ public:
     void Update(float dt);
 	Character();
 	void FSM();
+	Pair TreeSearch(Map& m);
 
 private:
 	
@@ -343,8 +346,7 @@ public:
     ChopTask(Character* character, Map* m)
         : c(character), map(m) {}
 
-    behaviour Run() override
-    {
+    behaviour Run() override{
         // Accumulate time
         elapsed += GetFrameTime();
 
@@ -357,9 +359,109 @@ public:
         // Finished chopping
         elapsed = 0.0f; // reset for next use
 		//DrawText("rdgggggggggggggggggggg",500,500,50,BLACK);
+		c->currentItem = ObjectType::ChoppedTree;
 		map->RemoveTree(static_cast<int>(c->pos.y / 10),static_cast<int>(c->pos.x / 10));
-		c->pos = {0,0};
+		//c->pos = {0,0};
 		//cout<<"idk man";
         return success;
     }
+};
+
+
+
+class FindTreeTask : public Task {
+private:
+    Character* c;
+    //Pair dest;
+    Map* map;
+	Pair found;
+	Pair notFound = {-1,-1};
+    bool pathRequested = false;
+
+public:
+    FindTreeTask(Character* character, Map* m)
+        : c(character),  map(m) {}
+
+    behaviour Run() override{
+    Pair start{
+        static_cast<int>(c->pos.y / 10),
+        static_cast<int>(c->pos.x / 10)
+    };
+
+    if (!pathRequested) {
+        c->path.clear();
+        c->currentPathIndex = 0;
+
+        found = map->BFS(start, ObjectType::Tree, c->path);
+
+
+        if (found == notFound || c->path.empty()) {
+            pathRequested = false;
+            return failure;
+        }
+		
+        pathRequested = true;
+    }
+
+	Vector2 dirTest = Vector2Subtract({found.second*10+5,found.first*10+5}, c->pos);
+	float distTest = Vector2Length(dirTest);
+	std::string elapsedStr1 = to_string(distTest);
+	const char* cstr1 = elapsedStr1.c_str();
+	DrawText(cstr1,500,400,50,PURPLE);
+	//c->currentPathIndex < 0 || c->currentPathIndex >= (int)c->path.size()|| 
+    if (distTest <=2.5f) {
+        pathRequested = false;
+        return success;
+    }
+
+    Pair next = c->path[c->currentPathIndex];
+
+    Vector2 target{
+        next.second * 10.0f + 5.0f,
+        next.first  * 10.0f + 5.0f
+    };
+
+    Vector2 dir{
+        target.x - c->pos.x,
+        target.y - c->pos.y
+    };
+
+    float dist = Vector2Length(dir);
+
+    if (dist < 1.0f) {
+        c->currentPathIndex++;
+        return running;
+    }
+
+    dir = Vector2Normalize(dir);
+    c->pos.x += dir.x * c->speed * GetFrameTime();
+    c->pos.y += dir.y * c->speed * GetFrameTime();
+	std::string elapsedStr = to_string(c->currentPathIndex);
+	const char* cstr = elapsedStr.c_str();
+	DrawText(cstr,500,500,50,PURPLE);
+    return running;
+	}
+};
+
+
+
+class DespositTask : public Task {
+private:
+    Character* c;
+    //Pair dest;
+    Map* map;
+	ObjectType item;
+
+public:
+    DespositTask(Character* character, Map* m, ObjectType it)
+        : c(character),  map(m), item(it) {}
+
+    behaviour Run() override{
+		if(c->currentItem==item){
+			c->currentItem==ObjectType::None;
+			map->AddObject((float)c->pos.y,(float)c->pos.x,ObjectType::ChoppedTree);
+			return success;
+		}
+		return failure;
+	}
 };

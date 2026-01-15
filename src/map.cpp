@@ -104,7 +104,11 @@ void Map::ConnectNodes() {
         int x = GetRandomValue(1,98);
         Node& current = grid[y][x];
         if(current.discovered == false&&current.passable==true){
-            current.objects.push_back({'O', {GetRandomValue(0,9), GetRandomValue(0,9)}});
+            //current.objects.push_back({'O', {GetRandomValue(0,9), GetRandomValue(0,9)}});
+            current.objects.push_back({
+                ObjectType::Ore,
+                Vector2{(float)GetRandomValue(0, 9),(float)GetRandomValue(0, 9)},
+                false});
             cout<<oreCount;
             oreCount++;
             
@@ -121,6 +125,10 @@ void Map::DrawMap() {
             //out << current.type << endl;
 		
 		char tempType = current.type;
+        if (current.discovered == false) {
+            //DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
+            continue;
+		}
 		if (tempType == 'T') {
             DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
 		}
@@ -140,16 +148,24 @@ void Map::DrawMap() {
 		}
         //DrawRectangle(270,540,10,10,BLACK);
         for(int j = 0;j < current.objects.size();j++){
-            if(current.objects[j].first == 'T'){// &&current.discovered == true){
+            if(current.objects[j].type == ObjectType::Tree&&current.discovered == true){
                 //DrawCircle(
                 //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
                 //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
                 //    1,
                 //    DARKGREEN);
-                DrawPixel(current.position.x + current.objects[j].second.first,current.position.y + current.objects[j].second.second,DARKGREEN);
+                DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKGREEN);
             }
-            else if(current.objects[j].first == 'O'){// &&current.discovered == true){
-                DrawPixel(current.position.x + current.objects[j].second.first,current.position.y + current.objects[j].second.second,RED);
+            else if(current.objects[j].type == ObjectType::Ore &&current.discovered == true){
+                DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,RED);
+                //DrawCircle(
+                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
+                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
+                //    1,
+                //    RED);
+            }
+            else if(current.objects[j].type == ObjectType::ChoppedTree &&current.discovered == true){
+                DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKBROWN);
                 //DrawCircle(
                 //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
                 //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
@@ -165,7 +181,10 @@ void Map::DrawMap() {
 
 void Node::PlaceTrees(int count) {
     // Place the first tree
-    objects.push_back({'T', {GetRandomValue(0, 9), GetRandomValue(0, 9)}});
+    objects.push_back({
+                ObjectType::Tree,
+                Vector2{(float)GetRandomValue(0, 9),(float)GetRandomValue(0, 9)},
+                false});
 
     for (int i = 1; i < count; i++) {
         bool foundSpot = false;
@@ -177,14 +196,17 @@ void Node::PlaceTrees(int count) {
 
             // Check if a tree is already at this position
             for (auto& obj : objects) {
-                if (obj.second.first == randomX && obj.second.second == randomY) {
+                if (obj.localPos.x == randomX && obj.localPos.y == randomY) {
                     safe = false;
                     break;
                 }
             }
 
             if (safe) {
-                objects.push_back({'T', {randomX, randomY}});
+                objects.push_back({
+                ObjectType::Tree,
+                Vector2{(float)randomX,(float)randomY},
+                false});
                 foundSpot = true;
             }
         }
@@ -303,8 +325,7 @@ bool Map::AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath)
    
 }
 
-const std::vector<Vector2>& Map::GetLastPath() const
-{
+const std::vector<Vector2>& Map::GetLastPath() const{
     return lastPath;
 }
 
@@ -314,8 +335,7 @@ Map& GetMap(){
 }
 
 
-Node& Map::GetNodeAtWorld(Vector2 worldPos)
-{
+Node& Map::GetNodeAtWorld(Vector2 worldPos){
     int col = int(worldPos.x / 10);
     int row = int(worldPos.y / 10);
     return grid[row][col];
@@ -323,22 +343,134 @@ Node& Map::GetNodeAtWorld(Vector2 worldPos)
 
 void Map::RemoveTree(int y, int x){
     DrawRectangle(10,10,1000,1000,BLACK);
-    for(int i = 0; i < 5;i++){ 
+    for(int i = 0; i < grid[y][x].objects.size();i++){ 
         
-        //if(grid[y][x].objects[i].first=='T'){ 
-        //    grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
-        //    cout<<"idddddddddddddddddddk man"<<'\n';
+        if(grid[y][x].objects[i].type==ObjectType::Tree&&grid[y][x].objects[i].locked==false){ 
+            grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
+            cout<<"idddddddddddddddddddk man"<<'\n';
             //std::string elapsedStr1 = to_string(grid[y][x].position.y);
 	        //const char* cstr1 = elapsedStr1.c_str();
 	        //DrawText(cstr1,500,400,50,PURPLE);
             cout<<grid[y][x].position.y<<'\n';
             cout<<grid[y][x].position.x<<'\n';
 
-        //    DrawRectangle(grid[y][x].position.x,grid[y][x].position.y,10,10,GRAY);
-        //    return; 
-        //} 
-        cout<<grid[y][x].objects[i].first<<'\n';
-        grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
+            DrawRectangle(grid[y][x].position.x,grid[y][x].position.y,10,10,GRAY);
+            return; 
+        } 
+        //cout<<grid[y][x].objects[i].first<<'\n';
+        //grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
         
         } 
     }
+
+
+Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath){
+    outPath.clear();
+
+    if (!IsValid(start.first, start.second))
+        return { -1, -1 };
+
+    // Create BFS node grid (same idea as A*)
+    std::vector<std::vector<AStarNode>> nodes(
+        height,
+        std::vector<AStarNode>(width)
+    );
+
+    std::queue<Pair> open;
+
+    // Initialize start node
+    nodes[start.first][start.second].g = 0.0f;
+    nodes[start.first][start.second].parentRow = start.first;
+    nodes[start.first][start.second].parentCol = start.second;
+
+    open.push(start);
+
+    int dRow[] = { -1, 1, 0, 0, 1, 1, -1, -1 };
+    int dCol[] = { 0, 0, -1, 1, 1, -1, 1, -1 };
+
+    Pair found = { -1, -1 };
+
+    while (!open.empty()) {
+        Pair current = open.front();
+        open.pop();
+
+        int r = current.first;
+        int c = current.second;
+
+
+        if (grid[r][c].discovered&&NodeHasObject(r, c, theObject)) {
+            found = current;
+            break;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            int nr = r + dRow[i];
+            int nc = c + dCol[i];
+
+            if (!IsValid(nr, nc))
+                continue;
+
+            if (!IsWalkable(nr, nc))
+                continue;
+
+            if (i >= 4) {
+                if (!IsWalkable(r, nc) || !IsWalkable(nr, c))
+                    continue;
+            }
+
+            auto& neighbor = nodes[nr][nc];
+
+            if (neighbor.g != FLT_MAX)
+                continue;
+
+            neighbor.g = nodes[r][c].g + 1.0f;
+            neighbor.parentRow = r;
+            neighbor.parentCol = c;
+
+            open.push({ nr, nc });
+        }
+    }
+
+    if (found.first == -1)
+        return { -1, -1 };
+
+    int cr = found.first;
+    int cc = found.second;
+
+    while (!(nodes[cr][cc].parentRow == cr &&
+             nodes[cr][cc].parentCol == cc)) {
+
+        outPath.push_back({ cr, cc });
+
+        int pr = nodes[cr][cc].parentRow;
+        int pc = nodes[cr][cc].parentCol;
+        cr = pr;
+        cc = pc;
+    }
+
+    outPath.push_back(start);
+    std::reverse(outPath.begin(), outPath.end());
+
+    return found;
+}
+
+bool Map::NodeHasObject(int row, int col, ObjectType type){
+    //for (const WorldObject& obj : grid[row][col].objects) {
+    for(int i = 0; i < grid[row][col].objects.size();i++){
+        if (grid[row][col].objects[i].type == type&&grid[row][col].objects[i].locked == false){
+            grid[row][col].objects[i].locked = true;
+            return true;
+        }
+    }
+    return false;
+}
+
+void Map::AddObject(int row, int col, ObjectType type){
+    //WorldObject insertObj;
+    WorldObject insertObj ={
+                ObjectType::ChoppedTree,
+                Vector2{(float)GetRandomValue(0, 9),(float)GetRandomValue(0, 9)},
+                false};
+    grid[row][col].objects.emplace_back(insertObj);
+
+}

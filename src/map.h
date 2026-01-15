@@ -27,9 +27,22 @@ enum status {
 };
 typedef pair<int, int> Pair;
 
+enum class ObjectType {
+	None,
+    Tree,
+	ChoppedTree,
+    Ore
+};
+struct WorldObject {
+    ObjectType type;
+    Vector2 localPos; 
+    bool locked = false;
+};
+
 // Creating a shortcut for pair<int, pair<int, int>> type
 typedef pair<double, pair<int, int> > pPair;
-typedef pair<char, pair<int,int>> Object;
+//typedef pair<char, pair<int,int>> Object;
+//std::vector<WorldObject> objects;
 class Node {
 public:
 	Vector2 position;
@@ -40,7 +53,7 @@ public:
 	float f;
 	float g;
 	float h;
-	std::vector<Object> objects;
+	std::vector<WorldObject> objects;
 	bool passable;
 	float moveCost;
 	char building;
@@ -60,9 +73,9 @@ public:
 	void DrawMap();
 	Map();
 	~Map();
-	void BFS(Pair start, Pair end);
-	void DFS(Pair start, Pair end);
-	void Dijkstra(Pair src, Pair dest);
+	//void BFS(Pair start, Pair end);
+	//void DFS(Pair start, Pair end);
+	//void Dijkstra(Pair src, Pair dest);
 	void PlaceTrees(int count);
 
 	void RemoveTree(int y, int x);
@@ -70,6 +83,10 @@ public:
 	bool AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath);
 	const std::vector<Vector2>& GetLastPath() const;
 	Node& GetNodeAtWorld(Vector2 worldPos);
+
+	Pair BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath);
+	bool NodeHasObject(int row, int col, ObjectType type);
+	void AddObject(int row, int col, ObjectType type);
 private:
 	void ConnectNodes();
 	struct AStarNode {

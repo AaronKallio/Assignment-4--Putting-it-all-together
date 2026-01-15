@@ -20,16 +20,23 @@ Character::Character()
 
 void Place(){
 	//map = GetMap();
-    constexpr size_t CHARACTER_COUNT = 50;
+    constexpr size_t CHARACTER_COUNT = 1;
     characters.clear();
     characters.reserve(CHARACTER_COUNT);
     for (size_t i = 0; i < CHARACTER_COUNT; ++i) {
         Character c;
         //c.pos = {(float)i * 3 +15, 980.0f};
-		c.pos = {(float)i * 3 +10, 900.0f};
+		c.pos = {(float)i * 0.5f +22.5f, 975.0f};
         characters.emplace_back(c);
-		characters[i].RequestPath(map,{10,98});
+		characters[i].RequestPath(map,{c.pos.x,c.pos.y});
     }
+    //for (size_t j = 0; j < CHARACTER_COUNT/2; ++j) {
+    //    Character c;
+        //c.pos = {(float)i * 3 +15, 980.0f};
+	//	c.pos = {(float)j * 1 +22, 970.0f};
+    //    characters.emplace_back(c);
+		//characters[i].RequestPath(map,{10,98});
+    //}
 
     cout << "Characters placed: " << characters.size() << '\n';
 }
@@ -93,13 +100,19 @@ void Character::Update(float dt)
     pos += dir * finalSpeed * dt;
 }
 
+Pair Character::TreeSearch(Map& m){
+
+}
 
 Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 {
 	Selector* root = new Selector();
 	Sequence* chopSequence = new Sequence();
-	chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+	//chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+    chopSequence -> AddChild(new FindTreeTask(c,m)); 
 	chopSequence -> AddChild(new ChopTask(c,m)); 
+    chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+    chopSequence -> AddChild(new DespositTask(c,m,ObjectType::ChoppedTree)); 
 	//Task* work = BuildFactoryTree(c);
 
 	root->AddChild(chopSequence);
@@ -110,7 +123,7 @@ Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 
 
 void SetTask(){
-	characters[0].behaviourTree = BuildCutTreeTree(&characters[0],{54,27},&map);
+	characters[0].behaviourTree = BuildCutTreeTree(&characters[0],{95,4},&map);
 }
 
 void RunTask(){
