@@ -18,7 +18,7 @@ int main()
     FillMap();
     Place();
     SetTask();
-    int gameSpeed = 20;
+    int gameSpeed = 1;
     
     while (!WindowShouldClose())
     {
@@ -31,7 +31,7 @@ int main()
         //ball.Draw();
         for(int i = 0; i < gameSpeed; i++){
             //RunMap();
-            RunCharacters();
+            //RunCharacters();
             RunTask();
         }
         //RunMap();

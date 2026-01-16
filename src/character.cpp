@@ -63,8 +63,8 @@ void DrawCharacters(){
     }
 }
 void RunCharacters(){
-	for(int i = 0; i < characters.size();i++){
-		characters[i].Update(GetFrameTime());
+	for(int i = 1; i < characters.size();i++){
+		//characters[i].Update(GetFrameTime());
 	}
 }
 
@@ -82,8 +82,8 @@ void Character::RequestPath(Map& map, Pair target)
     }
 }
 
-void Character::Update(float dt)
-{
+
+void Character::Update(float dt){
     if (currentNode >= path.size())
         return;
 
@@ -108,6 +108,10 @@ void Character::Update(float dt)
     pos += dir * finalSpeed * dt;
 }
 
+
+
+
+
 Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 {
 	Selector* root = new Selector();
@@ -129,10 +133,14 @@ Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 
 
 void SetTask(){
-	characters[0].behaviourTree = BuildCutTreeTree(&characters[0],{97,4},&map);
+    for(int i = 0; i < characters.size();i++){
+	characters[i].behaviourTree = BuildCutTreeTree(&characters[i],{97,4},&map);
+    }
 }
 
 void RunTask(){
-	characters[0].behaviourTree->Run();
+    for(int i = 0; i < characters.size();i++){
+	characters[i].behaviourTree->Run();
+    }
 }
 

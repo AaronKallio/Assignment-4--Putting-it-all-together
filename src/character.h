@@ -295,13 +295,13 @@ public:
 
 	Vector2 dirTest = Vector2Subtract({dest.second*10+5,dest.first*10+5}, c->pos);
 	float distTest = Vector2Length(dirTest);
-	std::string elapsedStr1 = to_string(distTest);
-	const char* cstr1 = elapsedStr1.c_str();
-	DrawText(cstr1,500,400,50,PURPLE);
+	//std::string elapsedStr1 = to_string(distTest);
+	//const char* cstr1 = elapsedStr1.c_str();
+	//DrawText(cstr1,500,400,50,PURPLE);
 	//c->currentPathIndex < 0 || c->currentPathIndex >= (int)c->path.size()|| 
     if (distTest <=2.5f) {
         pathRequested = false;
-		cout<<"what t"<<'\n';
+		//cout<<"what t"<<'\n';
         return success;
     }
 
@@ -324,12 +324,13 @@ public:
         return running;
     }
 
-    dir = Vector2Normalize(dir);
-    c->pos.x += dir.x * c->speed * GetFrameTime();
-    c->pos.y += dir.y * c->speed * GetFrameTime();
-	std::string elapsedStr = to_string(c->currentPathIndex);
-	const char* cstr = elapsedStr.c_str();
-	DrawText(cstr,500,500,50,PURPLE);
+    //dir = Vector2Normalize(dir);
+    //c->pos.x += dir.x * c->speed * GetFrameTime();
+    //c->pos.y += dir.y * c->speed * GetFrameTime();
+	c->Update(GetFrameTime());
+	//std::string elapsedStr = to_string(c->currentPathIndex);
+	//const char* cstr = elapsedStr.c_str();
+	//DrawText(cstr,500,500,50,PURPLE);
     return running;
 }
 };
@@ -354,7 +355,7 @@ public:
 
         // Still chopping
         if (elapsed < chopTime) {
-			DrawText("workin",500,500,50,PURPLE);
+			//DrawText("workin",500,500,50,PURPLE);
             return running;
         }
 
@@ -406,9 +407,9 @@ public:
 
 	Vector2 dirTest = Vector2Subtract({found.second*10+5,found.first*10+5}, c->pos);
 	float distTest = Vector2Length(dirTest);
-	std::string elapsedStr1 = to_string(distTest);
-	const char* cstr1 = elapsedStr1.c_str();
-	DrawText(cstr1,500,400,50,PURPLE);
+	//std::string elapsedStr1 = to_string(distTest);
+	//const char* cstr1 = elapsedStr1.c_str();
+	//DrawText(cstr1,500,400,50,PURPLE);
 	//c->currentPathIndex < 0 || c->currentPathIndex >= (int)c->path.size()|| 
     if (distTest <=2.5f) {
         pathRequested = false;
@@ -434,11 +435,13 @@ public:
         return running;
     }
 
-    dir = Vector2Normalize(dir);
-    c->pos.x += dir.x * c->speed * GetFrameTime();
-    c->pos.y += dir.y * c->speed * GetFrameTime();
-	std::string elapsedStr = to_string(c->currentPathIndex);
-	const char* cstr = elapsedStr.c_str();
+    //dir = Vector2Normalize(dir);
+    //c->pos.x += dir.x * c->speed * GetFrameTime();
+    //c->pos.y += dir.y * c->speed * GetFrameTime();
+	c->Update(GetFrameTime());
+	//std::string elapsedStr = to_string(c->currentPathIndex);
+	//const char* cstr = elapsedStr.c_str();
+	
 	//DrawText(cstr,500,500,50,PURPLE);
     return running;
 	}
@@ -467,7 +470,7 @@ public:
 
         map->AddObject(row, col, ObjectType::ChoppedTree);
 
-        cout << "deposit success\n";
+        //cout << "deposit success\n";
         return success;
     }
 

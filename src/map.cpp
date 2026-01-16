@@ -109,7 +109,7 @@ void Map::ConnectNodes() {
                 ObjectType::Ore,
                 Vector2{(float)GetRandomValue(0, 9),(float)GetRandomValue(0, 9)},
                 -1});
-            cout<<oreCount;
+            //cout<<oreCount;
             oreCount++;
             
         }
@@ -155,7 +155,7 @@ void Map::DrawMap() {
                 //    1,
                 //    DARKGREEN);
                 DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKGREEN);
-                cout<<current.objects[j].locked<<'\n';
+                //cout<<current.objects[j].locked<<'\n';
             }
             else if(current.objects[j].type == ObjectType::Ore &&current.discovered == true){
                 DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,RED);
@@ -181,7 +181,7 @@ void Map::DrawMap() {
     }
 
 
-void Node::PlaceTrees(int count) {
+void Node::PlaceTrees(int count) {    
     // Place the first tree
     objects.push_back({
                 ObjectType::Tree,
@@ -349,12 +349,12 @@ void Map::RemoveTree(int y, int x,int characterNum){
         
         if(grid[y][x].objects[i].type==ObjectType::Tree&&grid[y][x].objects[i].locked==characterNum){ 
             grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
-            cout<<"idddddddddddddddddddk man"<<'\n';
+            //cout<<"idddddddddddddddddddk man"<<'\n';
             //std::string elapsedStr1 = to_string(grid[y][x].position.y);
 	        //const char* cstr1 = elapsedStr1.c_str();
 	        //DrawText(cstr1,500,400,50,PURPLE);
-            cout<<grid[y][x].position.y<<'\n';
-            cout<<grid[y][x].position.x<<'\n';
+            //cout<<grid[y][x].position.y<<'\n';
+            //cout<<grid[y][x].position.x<<'\n';
 
             //DrawRectangle(grid[y][x].position.x,grid[y][x].position.y,10,10,GRAY);
             return; 
