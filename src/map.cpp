@@ -238,7 +238,7 @@ float Map::Heuristic(int row, int col, Pair dest) const
 }
 
 
-bool Map::AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath)
+bool Map::AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath, bool scout)
 {
     
     outPath.clear();
@@ -305,6 +305,9 @@ bool Map::AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath)
 
             if (!IsWalkable(nr, nc))
                 continue;
+            if(!scout&&!grid[nr][nc].discovered){
+                continue;
+            }
 
             float tileCost = grid[nr][nc].moveCost;
             float gNew = nodes[r][c].g + moveCost[i] * tileCost;
@@ -477,4 +480,27 @@ void Map::AddObject(int row, int col, ObjectType type){
     -1};
     grid[row][col].objects.emplace_back(insertObj);
 
+}
+
+Pair Map::RandomUndiscovered(){
+    //WorldObject insertObj;
+    while(true){
+        int randomRow = (float)GetRandomValue(1,98);
+        int randomCol = (float)GetRandomValue(1,98);
+        if(!grid[randomRow][randomCol].discovered&&grid[randomRow][randomCol].passable){
+            return {randomRow,randomCol};
+        }
+    }
+}
+
+void Map::Discover(int row, int col){
+    //WorldObject insertObj;
+    grid[row+1][col].discovered = true;
+    grid[row+1][col+1].discovered = true;
+    grid[row][col+1].discovered = true;
+    grid[row+1][col-1].discovered = true;
+    grid[row-1][col+1].discovered = true;
+    grid[row-1][col-1].discovered = true;
+    grid[row-1][col].discovered = true;
+    grid[row][col-1].discovered = true;
 }

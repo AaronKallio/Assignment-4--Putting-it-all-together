@@ -11,7 +11,8 @@
 //int felledTree = 0;
 
 enum State {
-	cutTree
+	cutTree,
+	Idle
 };
 enum behaviour {
 	success,
@@ -259,18 +260,20 @@ void DrawCharacters();
 void RunCharacters();
 void SetTask();
 void RunTask();
+void IncreaseItem(ObjectType item);
 
 class TravelTask : public Task {
 private:
     Character* c;
     Pair dest;
     Map* map;
+	bool s;
 
     bool pathRequested = false;
 
 public:
-    TravelTask(Character* character, Pair destination, Map* m)
-        : c(character), dest(destination), map(m) {}
+    TravelTask(Character* character, Pair destination, Map* m,bool scout)
+        : c(character), dest(destination), map(m), s(scout) {}
 
     behaviour Run() override
 {
@@ -283,7 +286,7 @@ public:
         c->path.clear();
         c->currentPathIndex = 0;
 
-        bool found = map->AStarSearch(start, dest, c->path);
+        bool found = map->AStarSearch(start, dest, c->path,s);
 
         if (!found || c->path.empty()) {
             pathRequested = false;
@@ -304,7 +307,7 @@ public:
 		//cout<<"what t"<<'\n';
         return success;
     }
-
+	/*
     Pair next = c->path[c->currentPathIndex];
 	
     Vector2 target{
@@ -324,6 +327,7 @@ public:
         return running;
     }
 
+	*/
     //dir = Vector2Normalize(dir);
     //c->pos.x += dir.x * c->speed * GetFrameTime();
     //c->pos.y += dir.y * c->speed * GetFrameTime();
@@ -416,6 +420,7 @@ public:
         return success;
     }
 
+	/*
     Pair next = c->path[c->currentPathIndex];
 
     Vector2 target{
@@ -434,6 +439,8 @@ public:
         c->currentPathIndex++;
         return running;
     }
+
+	*/
 
     //dir = Vector2Normalize(dir);
     //c->pos.x += dir.x * c->speed * GetFrameTime();
@@ -469,11 +476,76 @@ public:
         int col = static_cast<int>(c->pos.x / 10);
 
         map->AddObject(row, col, ObjectType::ChoppedTree);
+		IncreaseItem(ObjectType::ChoppedTree);
 
         //cout << "deposit success\n";
         return success;
     }
 
     return failure;
+}
+};
+
+class IdleTask : public Task {
+private:
+    Character* c;
+
+
+public:
+    IdleTask(Character* character)
+        : c(character) {}
+
+    behaviour Run() override {
+		c->state = Idle;
+		return success;
+}
+};
+
+
+class ScoutTask : public Task {
+private:
+    Character* c;
+    Map* map;
+	bool s;
+	Pair dest;
+
+    bool pathRequested = false;
+
+public:
+    ScoutTask(Character* character, Map* m,bool scout)
+        : c(character), map(m), s(scout) {}
+
+    behaviour Run() override
+{
+    Pair start{
+        static_cast<int>(c->pos.y / 10),
+        static_cast<int>(c->pos.x / 10)
+    };
+
+    if (!pathRequested) {
+        c->path.clear();
+        c->currentPathIndex = 0;
+		dest = map->RandomUndiscovered();
+        bool found = map->AStarSearch(start, dest, c->path,s);
+
+        if (!found || c->path.empty()) {
+			pathRequested = false;
+            return failure;
+        }
+
+        pathRequested = true;
+    }
+
+	Vector2 dirTest = Vector2Subtract({dest.second*10+5,dest.first*10+5}, c->pos);
+	float distTest = Vector2Length(dirTest);
+    if (distTest <=2.5f) {
+        pathRequested = false;
+		//cout<<"what t"<<'\n';
+        return success;
+    }
+
+	map->Discover((c->pos.y / 10),(c->pos.x / 10));
+	c->Update(GetFrameTime());
+    return running;
 }
 };

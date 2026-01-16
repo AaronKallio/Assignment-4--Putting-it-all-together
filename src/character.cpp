@@ -1,7 +1,7 @@
 #include "character.h"
 using namespace std;
 
-
+int wood = 0;
 std::vector<Character> characters;
 //Map map;
 Map& map = GetMap();
@@ -36,7 +36,7 @@ void Place(){
         c.characterNum = i;
 		c.pos = {(float)i * 0.5f +22.5f, 975.0f};
         characters.emplace_back(c);
-		characters[i].RequestPath(map,{10,98});
+		//characters[i].RequestPath(map,{10,98});
     }
     //for (size_t j = 0; j < CHARACTER_COUNT/2; ++j) {
     //    Character c;
@@ -64,6 +64,9 @@ void DrawCharacters(){
 }
 void RunCharacters(){
 	for(int i = 1; i < characters.size();i++){
+        if(characters[i].state!=Idle){
+            characters[i].Update(GetFrameTime());
+        }
 		//characters[i].Update(GetFrameTime());
 	}
 }
@@ -77,7 +80,7 @@ void Character::RequestPath(Map& map, Pair target)
     Pair start = { (int)(pos.y / 10.0f), (int)(pos.x / 10.0f) }; 
     Pair goal  = target; 
 
-    if (map.AStarSearch(start, goal, path)) {
+    if (map.AStarSearch(start, goal, path,false)) {
         currentNode = 0;
     }
 }
@@ -118,29 +121,57 @@ Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 	Sequence* chopSequence = new Sequence();
 	//chopSequence -> AddChild(new TravelTask(c,destination,m)); 
 
-
+    
     chopSequence -> AddChild(new FindTreeTask(c,m)); 
 	chopSequence -> AddChild(new ChopTask(c,m)); 
-    chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+    chopSequence -> AddChild(new TravelTask(c,destination,m,false)); 
     chopSequence -> AddChild(new DepositTask(c,m,ObjectType::ChoppedTree)); 
-	
+	IdleTask* idle = new IdleTask(c); 
 
 	root->AddChild(chopSequence);
-	//root->AddChild(work);
+	root->AddChild(idle);
 
 	return root;
 }
 
 
+Task* BuildScoutTree(Character* c, Map* m)
+{
+	Selector* root = new Selector();
+	//Sequence* chopSequence = new Sequence();
+	//chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+
+    
+    ScoutTask* scout = new ScoutTask(c,m,true);
+	IdleTask* idle = new IdleTask(c); 
+
+	root->AddChild(scout);
+	root->AddChild(idle);
+
+	return root;
+}
+
 void SetTask(){
-    for(int i = 0; i < characters.size();i++){
+    for(int i = 0; i < 5;i++){
+	characters[i].behaviourTree = BuildScoutTree(&characters[i],&map);
+    }
+    for(int i = 5; i < characters.size();i++){
 	characters[i].behaviourTree = BuildCutTreeTree(&characters[i],{97,4},&map);
     }
 }
 
 void RunTask(){
     for(int i = 0; i < characters.size();i++){
-	characters[i].behaviourTree->Run();
+        if(characters[i].state!=Idle){
+           characters[i].behaviourTree->Run();
+        }
+	
     }
 }
 
+void IncreaseItem(ObjectType item){
+    if(item==ObjectType::ChoppedTree){
+        wood++;
+    }
+    
+}

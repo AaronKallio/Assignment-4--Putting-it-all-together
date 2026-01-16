@@ -18,22 +18,24 @@ int main()
     FillMap();
     Place();
     SetTask();
-    int gameSpeed = 1;
+    int gameSpeed = 20;
     
     while (!WindowShouldClose())
     {
         //ball.Update();
         
-        BeginDrawing();
-        ClearBackground(BLACK);
-        RunMap();
-        DrawCharacters();
+        
         //ball.Draw();
         for(int i = 0; i < gameSpeed; i++){
             //RunMap();
             //RunCharacters();
             RunTask();
         }
+        BeginDrawing();
+        ClearBackground(BLACK);
+        RunMap();
+        DrawCharacters();
+        DrawItemsCollected();
         //RunMap();
         //DrawCharacters();
         //RunTask();

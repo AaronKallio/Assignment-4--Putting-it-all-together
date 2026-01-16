@@ -80,13 +80,15 @@ public:
 
 	void RemoveTree(int y, int x,int characterNum);
 	//bool LockObjectAt(int row, int col, ObjectType type, int characterNum);
-	bool AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath);
+	bool AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath, bool scout);
 	const std::vector<Vector2>& GetLastPath() const;
 	Node& GetNodeAtWorld(Vector2 worldPos);
 
 	Pair BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath, int characterNum);
 	bool NodeHasObject(int row, int col, ObjectType type,int characterNum);
 	void AddObject(int row, int col, ObjectType type);
+	Pair RandomUndiscovered();
+	void Discover(int row, int col);
 private:
 	void ConnectNodes();
 	struct AStarNode {
