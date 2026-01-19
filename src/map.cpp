@@ -19,11 +19,16 @@ Map theMap;
 namespace {
     const int dRow[8] = {-1, 1, 0, 0, -1, -1, 1, 1};
     const int dCol[8] = {0, 0, -1, 1, -1, 1, -1, 1};
+    //int dRow[] = { -1, 1, 0, 0 };
+    //int dCol[] = { 0, 0, -1, 1 };
 
     const float moveCost[8] = {
         10, 10, 10, 10,
         14, 14, 14, 14
     };
+    //const float moveCost[4] = {
+    //    10, 10, 10, 10
+    //};
 }
 
 
@@ -224,7 +229,7 @@ bool Map::IsValid(int row, int col) const
 bool Map::IsWalkable(int row, int col) const
 {
 
-    if(grid[row][col].type == 'V' || grid[row][col].type == 'B'){
+    if(grid[row][col].passable == false){
         return false;
     }
     return true;
@@ -368,7 +373,6 @@ void Map::RemoveTree(int y, int x,int characterNum){
         } 
     }
 
-
 Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath, int characterNum){
     outPath.clear();
 
@@ -458,6 +462,103 @@ Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath, int 
 
     return found;
 }
+/*
+Pair Map::BFS(Pair start,
+              ObjectType targetObject,
+              std::vector<Pair>& outPath,
+              int characterNum)
+{
+    outPath.clear();
+
+    // Safety checks
+    if (!IsValid(start.first, start.second))
+        return { -1, -1 };
+
+    if (!IsWalkable(start.first, start.second))
+        return { -1, -1 };
+
+    // Node grid (visited + parent)
+    std::vector<std::vector<AStarNode>> nodes(
+        height,
+        std::vector<AStarNode>(width)
+    );
+
+    std::queue<Pair> open;
+
+    // Initialize start
+    nodes[start.first][start.second].g = 0.0f;
+    nodes[start.first][start.second].parentRow = start.first;
+    nodes[start.first][start.second].parentCol = start.second;
+    open.push(start);
+
+    // 4-direction movement ONLY
+    const int dRow[4] = { -1, 1, 0, 0 };
+    const int dCol[4] = { 0, 0, -1, 1 };
+
+    Pair found = { -1, -1 };
+
+    while (!open.empty()) {
+        Pair current = open.front();
+        open.pop();
+
+        int r = current.first;
+        int c = current.second;
+
+        // SUCCESS CONDITION (no discovery check!)
+        if (NodeHasObject(r, c, targetObject, characterNum)) {
+            found = current;
+            break;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int nr = r + dRow[i];
+            int nc = c + dCol[i];
+
+            if (!IsValid(nr, nc))
+                continue;
+
+            if (!IsWalkable(nr, nc))
+                continue;
+
+            auto& neighbor = nodes[nr][nc];
+
+            // Already visited
+            if (neighbor.g != FLT_MAX)
+                continue;
+
+            neighbor.g = nodes[r][c].g + 1.0f;
+            neighbor.parentRow = r;
+            neighbor.parentCol = c;
+
+            open.push({ nr, nc });
+        }
+    }
+
+    // No object found
+    if (found.first == -1)
+        return { -1, -1 };
+
+    // ---- PATH RECONSTRUCTION ----
+    int cr = found.first;
+    int cc = found.second;
+
+    while (!(nodes[cr][cc].parentRow == cr &&
+             nodes[cr][cc].parentCol == cc)) {
+
+        outPath.push_back({ cr, cc });
+
+        int pr = nodes[cr][cc].parentRow;
+        int pc = nodes[cr][cc].parentCol;
+        cr = pr;
+        cc = pc;
+    }
+
+    outPath.push_back(start);
+    std::reverse(outPath.begin(), outPath.end());
+
+    return found;
+}
+*/
 
 bool Map::NodeHasObject(int row, int col, ObjectType type,int characterNum){//, int characterNum){
     //for (const WorldObject& obj : grid[row][col].objects) {
@@ -482,25 +583,95 @@ void Map::AddObject(int row, int col, ObjectType type){
 
 }
 
-Pair Map::RandomUndiscovered(){
-    //WorldObject insertObj;
-    while(true){
-        int randomRow = (float)GetRandomValue(1,98);
-        int randomCol = (float)GetRandomValue(1,98);
-        if(!grid[randomRow][randomCol].discovered&&grid[randomRow][randomCol].passable){
-            return {randomRow,randomCol};
+/*
+Pair Map::RandomUndiscovered()
+{
+    if (grid.empty())
+        return { -1, -1 };
+
+    std::vector<Pair> candidates;
+
+    for (int r = 0; r < (int)grid.size(); r++) {
+        for (int c = 0; c < (int)grid[r].size(); c++) {
+            if (!grid[r][c].discovered && grid[r][c].passable) {
+                candidates.push_back({ r, c });
+            }
+        }
+    }
+
+    if (candidates.empty())
+        return { -1, -1 };
+
+    return candidates[GetRandomValue(0, (int)candidates.size() - 1)];
+}
+
+
+void Map::Discover(int row, int col)
+{
+    for (int dy = -1; dy <= 1; dy++) {
+        for (int dx = -1; dx <= 1; dx++) {
+
+            int nr = row + dy;
+            int nc = col + dx;
+
+            if (IsValid(nr, nc)) {
+                grid[nr][nc].discovered = true;
+            }
         }
     }
 }
+*/
+Pair Map::FindFrontier()
+{
+    if (grid.empty())
+        return { -1, -1 };
 
+    std::vector<Pair> frontiers;
+
+    for (int r = 0; r < grid.size(); r++) {
+        for (int c = 0; c < grid[r].size(); c++) {
+
+            Node& node = grid[r][c];
+
+            if (!node.passable || !node.discovered)
+                continue;
+
+            for (int i = 0; i < 4; i++) {
+                int nr = r + dRow[i];
+                int nc = c + dCol[i];
+
+                if (IsValid(nr, nc) && !grid[nr][nc].discovered) {
+                    frontiers.push_back({ r, c });
+                    break;
+                }
+            }
+        }
+    }
+
+    if (frontiers.empty())
+        return { -1, -1 };
+
+    return frontiers[GetRandomValue(0, frontiers.size() - 1)];
+}
+    
+
+
+Pair Map::RandomUndiscovered(){
+    while(true){ 
+        int randomRow = (float)GetRandomValue(1,98); 
+        int randomCol = (float)GetRandomValue(1,98); 
+        if(!grid[randomRow][randomCol].discovered&&grid[randomRow][randomCol].passable){ 
+            return {randomRow,randomCol}; 
+        } 
+    } 
+} 
 void Map::Discover(int row, int col){
-    //WorldObject insertObj;
-    grid[row+1][col].discovered = true;
-    grid[row+1][col+1].discovered = true;
-    grid[row][col+1].discovered = true;
-    grid[row+1][col-1].discovered = true;
-    grid[row-1][col+1].discovered = true;
-    grid[row-1][col-1].discovered = true;
-    grid[row-1][col].discovered = true;
-    grid[row][col-1].discovered = true;
+    grid[row+1][col].discovered = true; 
+    grid[row+1][col+1].discovered = true; 
+    grid[row][col+1].discovered = true; 
+    grid[row+1][col-1].discovered = true; 
+    grid[row-1][col+1].discovered = true; 
+    grid[row-1][col-1].discovered = true; 
+    grid[row-1][col].discovered = true; 
+    grid[row][col-1].discovered = true; 
 }

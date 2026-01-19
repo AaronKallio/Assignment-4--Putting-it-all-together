@@ -19,7 +19,6 @@ Character::Character(){
     currentItem = ObjectType::None;
 
     currentPathIndex = 0;
-    currentNode = 0;
 
     behaviourTree = nullptr;
     decisionState = nullptr;
@@ -63,7 +62,7 @@ void DrawCharacters(){
     }
 }
 void RunCharacters(){
-	for(int i = 1; i < characters.size();i++){
+	for(int i = 0; i < characters.size();i++){
         if(characters[i].state!=Idle){
             characters[i].Update(GetFrameTime());
         }
@@ -81,21 +80,21 @@ void Character::RequestPath(Map& map, Pair target)
     Pair goal  = target; 
 
     if (map.AStarSearch(start, goal, path,false)) {
-        currentNode = 0;
+        currentPathIndex = 0;
     }
 }
 
 
 void Character::Update(float dt){
-    if (currentNode >= path.size())
+    if (currentPathIndex >= path.size())
         return;
 
 
-    Vector2 target = { path[currentNode].second * 10.0f + 5, path[currentNode].first * 10.0f + 5};
+    Vector2 target = { path[currentPathIndex].second * 10.0f + 5, path[currentPathIndex].first * 10.0f + 5};
     Vector2 dir = Vector2Subtract(target, pos);
     float dist = Vector2Length(dir);
     if (dist < 2.0f) {
-        currentNode++;
+        currentPathIndex++;
         return;
     }
 
@@ -142,7 +141,7 @@ Task* BuildScoutTree(Character* c, Map* m)
 	//chopSequence -> AddChild(new TravelTask(c,destination,m)); 
 
     
-    ScoutTask* scout = new ScoutTask(c,m,true);
+    ScoutTask* scout = new ScoutTask(c,m);
 	IdleTask* idle = new IdleTask(c); 
 
 	root->AddChild(scout);
@@ -155,8 +154,8 @@ void SetTask(){
     for(int i = 0; i < 5;i++){
 	characters[i].behaviourTree = BuildScoutTree(&characters[i],&map);
     }
-    for(int i = 5; i < characters.size();i++){
-	characters[i].behaviourTree = BuildCutTreeTree(&characters[i],{97,4},&map);
+    for(int j = 5; j < characters.size();j++){
+	characters[j].behaviourTree = BuildCutTreeTree(&characters[j],{97,4},&map);
     }
 }
 

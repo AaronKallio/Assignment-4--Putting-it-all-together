@@ -239,7 +239,6 @@ public:
 	float speed;
 	ObjectType currentItem;
 	std::vector<Pair> path;
-    size_t currentNode = 0;
 	int currentPathIndex;
 	Task* behaviourTree = nullptr;
 	DecisionTreeNode* decisionState;
@@ -411,45 +410,11 @@ public:
 
 	Vector2 dirTest = Vector2Subtract({found.second*10+5,found.first*10+5}, c->pos);
 	float distTest = Vector2Length(dirTest);
-	//std::string elapsedStr1 = to_string(distTest);
-	//const char* cstr1 = elapsedStr1.c_str();
-	//DrawText(cstr1,500,400,50,PURPLE);
-	//c->currentPathIndex < 0 || c->currentPathIndex >= (int)c->path.size()|| 
     if (distTest <=2.5f) {
         pathRequested = false;
         return success;
     }
-
-	/*
-    Pair next = c->path[c->currentPathIndex];
-
-    Vector2 target{
-        next.second * 10.0f + 5.0f,
-        next.first  * 10.0f + 5.0f
-    };
-
-    Vector2 dir{
-        target.x - c->pos.x,
-        target.y - c->pos.y
-    };
-
-    float dist = Vector2Length(dir);
-
-    if (dist < 1.0f) {
-        c->currentPathIndex++;
-        return running;
-    }
-
-	*/
-
-    //dir = Vector2Normalize(dir);
-    //c->pos.x += dir.x * c->speed * GetFrameTime();
-    //c->pos.y += dir.y * c->speed * GetFrameTime();
 	c->Update(GetFrameTime());
-	//std::string elapsedStr = to_string(c->currentPathIndex);
-	//const char* cstr = elapsedStr.c_str();
-	
-	//DrawText(cstr,500,500,50,PURPLE);
     return running;
 	}
 };
@@ -501,51 +466,98 @@ public:
 }
 };
 
-
+/*
 class ScoutTask : public Task {
 private:
     Character* c;
     Map* map;
-	bool s;
-	Pair dest;
 
+    Pair dest = { -1, -1 };
     bool pathRequested = false;
 
 public:
-    ScoutTask(Character* character, Map* m,bool scout)
-        : c(character), map(m), s(scout) {}
+    ScoutTask(Character* character, Map* m)
+        : c(character), map(m) {}
 
     behaviour Run() override
-{
-    Pair start{
-        static_cast<int>(c->pos.y / 10),
-        static_cast<int>(c->pos.x / 10)
-    };
+    {
+        Pair start{
+            static_cast<int>(c->pos.y / 10),
+            static_cast<int>(c->pos.x / 10)
+        };
 
-    if (!pathRequested) {
-        c->path.clear();
-        c->currentPathIndex = 0;
-		dest = map->RandomUndiscovered();
-        bool found = map->AStarSearch(start, dest, c->path,s);
+        // Request new destination if needed
+        if (!pathRequested) {
+            dest = map->RandomUndiscovered();
 
-        if (!found || c->path.empty()) {
-			pathRequested = false;
-            return failure;
+            if (dest.first == -1)
+                return success; // map fully explored
+
+            c->path.clear();
+            c->currentPathIndex = 0;
+
+            if (!map->AStarSearch(start, dest, c->path, true))
+                return failure;
+
+            pathRequested = true;
         }
 
-        pathRequested = true;
-    }
+        // Move character
+        c->Update(GetFrameTime());
 
-	Vector2 dirTest = Vector2Subtract({dest.second*10+5,dest.first*10+5}, c->pos);
-	float distTest = Vector2Length(dirTest);
-    if (distTest <=2.5f) {
-        pathRequested = false;
-		//cout<<"what t"<<'\n';
-        return success;
-    }
+        // Discover area
+        int r = static_cast<int>(c->pos.y / 10);
+        int ccol = static_cast<int>(c->pos.x / 10);
+        map->Discover(r, ccol);
 
-	map->Discover((c->pos.y / 10),(c->pos.x / 10));
-	c->Update(GetFrameTime());
-    return running;
-}
+        // Check arrival
+        Vector2 target{
+            dest.second * 10.0f + 5.0f,
+            dest.first  * 10.0f + 5.0f
+        };
+
+        if (Vector2Distance(c->pos, target) <= 2.5f) {
+            pathRequested = false;
+        }
+
+        return running;
+    }
 };
+*/
+
+
+class ScoutTask : public Task {
+	private: Character* c; 
+	Map* map; 
+	Pair dest; 
+	bool pathRequested = false; 
+
+	public: 
+	ScoutTask(Character* character, Map* m)
+	: c(character), map(m) {}
+	behaviour Run() override { 
+		Pair start{ static_cast<int>(c->pos.y / 10), static_cast<int>(c->pos.x / 10) }; 
+		if (!pathRequested) { 
+			c->path.clear(); c->currentPathIndex = 0; 
+			//dest = map->RandomUndiscovered();
+			dest = map->FindFrontier();
+			bool found = map->AStarSearch(start, dest, c->path,true); 
+			//if (!found || c->path.empty()) { 
+			//	pathRequested = false; 
+			//	return failure; 
+			//} 
+			pathRequested = true; 
+		} 
+		Vector2 dirTest = Vector2Subtract({dest.second*10+5,dest.first*10+5}, c->pos); 
+		float distTest = Vector2Length(dirTest); 
+		if (distTest <=2.5f) { 
+			pathRequested = false; 
+			//dest = map->RandomUndiscovered(); 
+			return running; 
+		} 
+		map->Discover((c->pos.y / 10),(c->pos.x / 10)); 
+		c->Update(GetFrameTime()); 
+		return running; 
+	} 
+}; 
+

@@ -89,6 +89,7 @@ public:
 	void AddObject(int row, int col, ObjectType type);
 	Pair RandomUndiscovered();
 	void Discover(int row, int col);
+	Pair FindFrontier();
 private:
 	void ConnectNodes();
 	struct AStarNode {
