@@ -2,3 +2,7 @@
 #include "map.h"
 #include "character.h"
 void DrawItemsCollected();
+void SetTask();
+void RunTask();
+void Place();
+

@@ -24,31 +24,20 @@ Character::Character(){
     behaviourTree = nullptr;
     decisionState = nullptr;
 }
-
+/*
 void Place(){
-	//map = GetMap();
     constexpr size_t CHARACTER_COUNT = 50;
     characters.clear();
     characters.reserve(CHARACTER_COUNT);
     for (size_t i = 0; i < CHARACTER_COUNT; ++i) {
         Character c;
-        //c.pos = {(float)i * 3 +15, 980.0f};
         c.characterNum = i;
 		c.pos = {(float)i * 0.5f +22.5f, 975.0f};
         characters.emplace_back(c);
-		//characters[i].RequestPath(map,{10,98});
     }
-    //for (size_t j = 0; j < CHARACTER_COUNT/2; ++j) {
-    //    Character c;
-        //c.pos = {(float)i * 3 +15, 980.0f};
-	//	c.pos = {(float)j * 1 +22, 970.0f};
-    //    characters.emplace_back(c);
-		//characters[i].RequestPath(map,{10,98});
-    //}
-
     cout << "Characters placed: " << characters.size() << '\n';
 }
-
+*/
 void DrawCharacters(){
     for (const Character& c : characters) {
        //cout << c.pos.x << '\n'; 
@@ -198,9 +187,7 @@ Task* BuildMineTree(Character* c, Pair destination, Map* m)
 
     return root;
 }
-
-
-
+/*
 void SetTask(){
     for(int i = 0; i < 5;i++){
         characters[i].type = scout;
@@ -225,7 +212,7 @@ void RunTask(){
 	
     }
 }
-
+*/
 void IncreaseItem(ObjectType item){
     if (item == ObjectType::ChoppedTree) {
         wood++;

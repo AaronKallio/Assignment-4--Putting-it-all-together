@@ -260,6 +260,10 @@ void RunCharacters();
 void SetTask();
 void RunTask();
 void IncreaseItem(ObjectType item);
+Task* BuildScoutTree(Character* c, Map* m);
+Task* BuildCutTreeTree(Character* c, Pair destination, Map* m);
+Task* BuildMineTree(Character* c, Pair destination, Map* m);
+Task* BuildUpgradeTree(Character* c, Type t);
 
 class TravelTask : public Task {
 private:

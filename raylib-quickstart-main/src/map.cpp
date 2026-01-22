@@ -420,6 +420,9 @@ Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath, int 
             if (!IsWalkable(nr, nc))
                 continue;
 
+            if (!grid[nr][nc].discovered)
+                continue;
+
             if (i >= 4) {
                 if (!IsWalkable(r, nc) || !IsWalkable(nr, c))
                     continue;
