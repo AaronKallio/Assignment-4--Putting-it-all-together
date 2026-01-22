@@ -2,6 +2,7 @@
 using namespace std;
 
 int wood = 0;
+int ore = 0;
 std::vector<Character> characters;
 //Map map;
 Map& map = GetMap();
@@ -179,13 +180,37 @@ Task* BuildScoutTree(Character* c, Map* m)
 	return root;
 }
 
+
+Task* BuildMineTree(Character* c, Pair destination, Map* m)
+{
+    Selector* root = new Selector();
+    Sequence* mineSequence = new Sequence();
+    //chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+
+
+    mineSequence->AddChild(new FindIronTask(c, m));
+    mineSequence->AddChild(new TravelTask(c, destination, m, false));
+    mineSequence->AddChild(new DepositTask(c, m, ObjectType::Ore));
+
+
+    root->AddChild(mineSequence);
+    //root->AddChild(idle);
+
+    return root;
+}
+
+
+
 void SetTask(){
     for(int i = 0; i < 5;i++){
         characters[i].type = scout;
 	    characters[i].behaviourTree = BuildScoutTree(&characters[i],&map);
     }
-    for(int j = 5; j < characters.size()-5;j++){
+    for(int j = 5; j < characters.size()-10;j++){
 	    characters[j].behaviourTree = BuildCutTreeTree(&characters[j],{97,4},&map);
+    }
+    for (int t = characters.size() - 10; t < characters.size() - 5; t++) {
+        characters[t].behaviourTree = BuildMineTree(&characters[t], { 97,4 }, &map);
     }
     for (int k = characters.size() - 5; k < characters.size(); k++) {
         characters[k].behaviourTree = BuildUpgradeTree(&characters[k], scout);
@@ -202,8 +227,10 @@ void RunTask(){
 }
 
 void IncreaseItem(ObjectType item){
-    if(item==ObjectType::ChoppedTree){
+    if (item == ObjectType::ChoppedTree) {
         wood++;
     }
-    
+    else if (item == ObjectType::Ore) {
+        ore++;
+    }
 }

@@ -366,7 +366,7 @@ public:
         elapsed = 0.0f; // reset for next use
 		//DrawText("rdgggggggggggggggggggg",500,500,50,BLACK);
 		c->currentItem = ObjectType::ChoppedTree;
-		map->RemoveTree(static_cast<int>(c->pos.y / 10),static_cast<int>(c->pos.x / 10),c->characterNum);
+		map->RemoveItem(static_cast<int>(c->pos.y / 10),static_cast<int>(c->pos.x / 10),c->characterNum,ObjectType::Tree);
 		//c->pos = {0,0};
 		//cout<<"idk man";
         return success;
@@ -440,8 +440,8 @@ public:
         int row = static_cast<int>(c->pos.y / 10);
         int col = static_cast<int>(c->pos.x / 10);
 
-        map->AddObject(row, col, ObjectType::ChoppedTree);
-		IncreaseItem(ObjectType::ChoppedTree);
+        map->AddObject(row, col, item);
+		IncreaseItem(item);
 
         //cout << "deposit success\n";
         return success;
@@ -592,50 +592,7 @@ public:
 	}
 };
 
-class FindTreeTask : public Task {
-private:
-    Character* c;
-    //Pair dest;
-    Map* map;
-	Pair found;
-	Pair notFound = {-1,-1};
-    bool pathRequested = false;
 
-public:
-    FindTreeTask(Character* character, Map* m)
-        : c(character),  map(m) {}
-
-    behaviour Run() override{
-    Pair start{
-        static_cast<int>(c->pos.y / 10),
-        static_cast<int>(c->pos.x / 10)
-    };
-
-    if (!pathRequested) {
-        c->path.clear();
-        c->currentPathIndex = 0;
-
-        found = map->BFS(start, ObjectType::Tree, c->path,c->characterNum);
-		
-
-        if (found == notFound || c->path.empty()) {
-            pathRequested = false;
-            return failure;
-        }
-		
-        pathRequested = true;
-    }
-
-	Vector2 dirTest = Vector2Subtract({ (float)found.second*10+5,(float)found.first*10+5}, c->pos);
-	float distTest = Vector2Length(dirTest);
-    if (distTest <=2.5f) {
-        pathRequested = false;
-        return success;
-    }
-	c->Update(GetFrameTime());
-    return running;
-	}
-};
 
 class FindIronTask : public Task {
 private:
@@ -661,14 +618,20 @@ public:
 			c->path.clear();
 			c->currentPathIndex = 0;
 
-			found = map->FindIron(start);
-
-
-			if (found == notFound || c->path.empty()) {
+			found = map->FindIron(start, c->characterNum);
+			//cout << "buddy";
+			if (found == notFound) {
+				//cout << "buddy";
 				pathRequested = false;
 				return failure;
 			}
 			map->AStarSearch(start, found, c->path, false);
+			if (found == notFound || c->path.empty()) {
+				//cout << "buddy";
+				pathRequested = false;
+				return failure;
+			}
+			//bool runLock = map->NodeHasObject(found.second, found.first, ObjectType::Ore,c->characterNum);
 			pathRequested = true;
 		}
 
@@ -676,9 +639,12 @@ public:
 		float distTest = Vector2Length(dirTest);
 		if (distTest <= 2.5f) {
 			pathRequested = false;
+			map->RemoveItem(static_cast<int>(c->pos.y / 10), static_cast<int>(c->pos.x / 10), c->characterNum, ObjectType::Ore);
+			c->currentItem = ObjectType::Ore;
 			return success;
 		}
 		c->Update(GetFrameTime());
 		return running;
 	}
 };
+

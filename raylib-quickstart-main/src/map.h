@@ -79,7 +79,7 @@ public:
 	//void Dijkstra(Pair src, Pair dest);
 	void PlaceTrees(int count);
 
-	void RemoveTree(int y, int x,int characterNum);
+	void RemoveItem(int y, int x, int characterNum, ObjectType object);
 	//bool LockObjectAt(int row, int col, ObjectType type, int characterNum);
 	bool AStarSearch(Pair start, Pair goal, std::vector<Pair>& outPath, bool scout);
 	const std::vector<Vector2>& GetLastPath() const;
@@ -91,7 +91,7 @@ public:
 	Pair RandomUndiscovered();
 	void Discover(int row, int col);
 	Pair FindFrontier();
-	Pair FindIron(Pair location);
+	Pair FindIron(Pair location, int characterNum);
 private:
 	void ConnectNodes();
 	struct AStarNode {

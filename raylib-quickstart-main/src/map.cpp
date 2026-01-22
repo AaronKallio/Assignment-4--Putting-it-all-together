@@ -161,10 +161,17 @@ void Map::DrawMap() {
                 //    1,
                 //    DARKGREEN);
                 DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKGREEN);
+                //std::string str1 = to_string(current.objects[j].locked);
+                //const char* cstr1 = str1.c_str();
+                //DrawText(cstr1, current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, 20, WHITE);
                 //cout<<current.objects[j].locked<<'\n';
             }
             else if(current.objects[j].type == ObjectType::Ore &&current.discovered == true){
                 DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,RED);
+                //std::string str1 =to_string(current.objects[j].locked);
+                //const char* cstr1 = str1.c_str();
+                //DrawText(cstr1, current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y,20,WHITE);
+                //cout << current.objects[j].locked;
                 //DrawCircle(
                 //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
                 //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
@@ -352,26 +359,16 @@ Node& Map::GetNodeAtWorld(Vector2 worldPos){
     return grid[row][col];
 }
 
-void Map::RemoveTree(int y, int x,int characterNum){
-    DrawRectangle(10,10,1000,1000,BLACK);
+void Map::RemoveItem(int y, int x,int characterNum,ObjectType object){
+    //DrawRectangle(10,10,1000,1000,BLACK);
     for(int i = 0; i < grid[y][x].objects.size();i++){ 
         
-        if(grid[y][x].objects[i].type==ObjectType::Tree&&grid[y][x].objects[i].locked==characterNum){ 
+        if(grid[y][x].objects[i].type==object&&grid[y][x].objects[i].locked==characterNum){ 
             grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
-            //cout<<"idddddddddddddddddddk man"<<'\n';
-            //std::string elapsedStr1 = to_string(grid[y][x].position.y);
-	        //const char* cstr1 = elapsedStr1.c_str();
-	        //DrawText(cstr1,500,400,50,PURPLE);
-            //cout<<grid[y][x].position.y<<'\n';
-            //cout<<grid[y][x].position.x<<'\n';
-
-            //DrawRectangle(grid[y][x].position.x,grid[y][x].position.y,10,10,GRAY);
+            //cout << characterNum << '\n';
             return; 
         } 
-        //cout<<grid[y][x].objects[i].first<<'\n';
-        //grid[y][x].objects.erase(grid[y][x].objects.begin() + i); 
-        
-        } 
+       } 
     }
 
 Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath, int characterNum){
@@ -687,18 +684,30 @@ void Map::Discover(int row, int col){
 }
 
 
-Pair Map::FindIron(Pair location) {
+Pair Map::FindIron(Pair location, int characterNum) {
     Pair closest = {-1,-1};
     float distance = FLT_MAX;
-
+    float storeI = -1;
     for (int i = 0; i < iron.size();i++) {
         double dx = location.first - iron[i].first;
         double dy = iron[i].second - location.second;
         float tempDistance = dx * dx + dy * dy;
         if (tempDistance<distance&&grid[iron[i].first][iron[i].second].discovered) {
+            storeI = i;
             distance = tempDistance;
             closest = iron[i];
         }
     }
-    return closest;
+    if (closest.first == -1) {
+        //cout << "toomy";
+        return closest;
+    }
+    if (NodeHasObject(closest.first, closest.second, ObjectType::Ore, characterNum)) {
+        iron.erase(iron.begin() + storeI); 
+        //cout << "larry";
+        return closest;
+        
+    }
+
+    return { -1,-1 };
 }
