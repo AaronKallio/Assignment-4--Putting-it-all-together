@@ -227,14 +227,14 @@ class Character {
 
 public:
 	Vector2 pos;
-	Vector2 velocity;
+	//Vector2 velocity;
 	State state;
-	float rotation;
-	bool active;
-	Vector2 wanderTarget;
-	int collisionTimer;
-	Vector2 collisionVector;
-	int previousPath;
+	//float rotation;
+	//bool active;
+	//Vector2 wanderTarget;
+	//int collisionTimer;
+	//Vector2 collisionVector;
+	//int previousPath;
     Type type;
 	float speed;
 	ObjectType currentItem;
@@ -538,9 +538,15 @@ class ScoutTask : public Task {
 	behaviour Run() override { 
 		Pair start{ static_cast<int>(c->pos.y / 10), static_cast<int>(c->pos.x / 10) }; 
 		if (!pathRequested) { 
-			c->path.clear(); c->currentPathIndex = 0; 
+			c->path.clear(); c->currentPathIndex = 0;
+			if (GetRandomValue(1, 10)!=1) {
+				dest = map->FindFrontier();
+			}
+			else {
+				dest = map->RandomUndiscovered();
+			}
 			//dest = map->RandomUndiscovered();
-			dest = map->FindFrontier();
+			//dest = map->FindFrontier();
 			bool found = map->AStarSearch(start, dest, c->path,true); 
 			//if (!found || c->path.empty()) { 
 			//	pathRequested = false; 
@@ -561,3 +567,118 @@ class ScoutTask : public Task {
 	} 
 }; 
 
+
+class UpgradeTask : public Task {
+private:
+	Character* c;
+	//Map* map;
+	float elapsed = 0.0f;
+	static constexpr float upgradeTime = 60.0f;
+	Type t;
+
+public:
+	UpgradeTask(Character* character, Type desiredType)
+		: c(character), t(desiredType){
+	}
+
+	behaviour Run() override {
+		elapsed += GetFrameTime();
+		if (elapsed < upgradeTime) {
+			return running;
+		}
+		elapsed = 0.0f; // reset for next use
+		c->type = t;
+		return success;
+	}
+};
+
+class FindTreeTask : public Task {
+private:
+    Character* c;
+    //Pair dest;
+    Map* map;
+	Pair found;
+	Pair notFound = {-1,-1};
+    bool pathRequested = false;
+
+public:
+    FindTreeTask(Character* character, Map* m)
+        : c(character),  map(m) {}
+
+    behaviour Run() override{
+    Pair start{
+        static_cast<int>(c->pos.y / 10),
+        static_cast<int>(c->pos.x / 10)
+    };
+
+    if (!pathRequested) {
+        c->path.clear();
+        c->currentPathIndex = 0;
+
+        found = map->BFS(start, ObjectType::Tree, c->path,c->characterNum);
+		
+
+        if (found == notFound || c->path.empty()) {
+            pathRequested = false;
+            return failure;
+        }
+		
+        pathRequested = true;
+    }
+
+	Vector2 dirTest = Vector2Subtract({ (float)found.second*10+5,(float)found.first*10+5}, c->pos);
+	float distTest = Vector2Length(dirTest);
+    if (distTest <=2.5f) {
+        pathRequested = false;
+        return success;
+    }
+	c->Update(GetFrameTime());
+    return running;
+	}
+};
+
+class FindIronTask : public Task {
+private:
+	Character* c;
+	//Pair dest;
+	Map* map;
+	Pair found;
+	Pair notFound = { -1,-1 };
+	bool pathRequested = false;
+
+public:
+	FindIronTask(Character* character, Map* m)
+		: c(character), map(m) {
+	}
+
+	behaviour Run() override {
+		Pair start{
+			static_cast<int>(c->pos.y / 10),
+			static_cast<int>(c->pos.x / 10)
+		};
+
+		if (!pathRequested) {
+			c->path.clear();
+			c->currentPathIndex = 0;
+
+			found = map->FindIron(start);
+
+
+			if (found == notFound || c->path.empty()) {
+				pathRequested = false;
+				return failure;
+			}
+			map->AStarSearch(start, found, c->path, false);
+			pathRequested = true;
+		}
+
+		Vector2 dirTest = Vector2Subtract({ (float)found.second * 10 + 5,(float)found.first * 10 + 5 }, c->pos);
+		float distTest = Vector2Length(dirTest);
+		if (distTest <= 2.5f) {
+			pathRequested = false;
+			return success;
+		}
+		c->Update(GetFrameTime());
+		return running;
+	}
+};

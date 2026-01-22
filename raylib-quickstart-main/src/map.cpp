@@ -115,6 +115,7 @@ void Map::ConnectNodes() {
                 Vector2{(float)GetRandomValue(0, 9),(float)GetRandomValue(0, 9)},
                 -1});
             //cout<<oreCount;
+            iron.push_back({y,x});
             oreCount++;
             
         }
@@ -627,9 +628,8 @@ Pair Map::FindFrontier()
         return { -1, -1 };
 
     std::vector<Pair> frontiers;
-
-    for (int r = 0; r < grid.size(); r++) {
-        for (int c = 0; c < grid[r].size(); c++) {
+    for (int r = 1; r < grid.size()-1; r++) {
+        for (int c = 1; c < grid[r].size()-1; c++) {
 
             Node& node = grid[r][c];
 
@@ -656,15 +656,25 @@ Pair Map::FindFrontier()
     
 
 
-Pair Map::RandomUndiscovered(){
-    while(true){ 
-        int randomRow = (float)GetRandomValue(1,98); 
-        int randomCol = (float)GetRandomValue(1,98); 
-        if(!grid[randomRow][randomCol].discovered&&grid[randomRow][randomCol].passable){ 
-            return {randomRow,randomCol}; 
-        } 
-    } 
-} 
+Pair Map::RandomUndiscovered()
+{
+    std::vector<Pair> candidates;
+
+    for (int r = 1; r < grid.size() - 1; ++r) {
+        for (int c = 1; c < grid[r].size() - 1; ++c) {
+            if (!grid[r][c].discovered && grid[r][c].passable) {
+                candidates.push_back({ r, c });
+            }
+        }
+    }
+
+    if (candidates.empty())
+        return { -1, -1 }; // nothing left
+
+    return candidates[GetRandomValue(0, candidates.size() - 1)];
+}
+
+
 void Map::Discover(int row, int col){
     grid[row+1][col].discovered = true; 
     grid[row+1][col+1].discovered = true; 
@@ -674,4 +684,21 @@ void Map::Discover(int row, int col){
     grid[row-1][col-1].discovered = true; 
     grid[row-1][col].discovered = true; 
     grid[row][col-1].discovered = true; 
+}
+
+
+Pair Map::FindIron(Pair location) {
+    Pair closest = {-1,-1};
+    float distance = FLT_MAX;
+
+    for (int i = 0; i < iron.size();i++) {
+        double dx = location.first - iron[i].first;
+        double dy = iron[i].second - location.second;
+        float tempDistance = dx * dx + dy * dy;
+        if (tempDistance<distance&&grid[iron[i].first][iron[i].second].discovered) {
+            distance = tempDistance;
+            closest = iron[i];
+        }
+    }
+    return closest;
 }

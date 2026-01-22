@@ -67,6 +67,7 @@ public:
 class Map {
 public:
 	std::vector<std::vector<Node>> grid;
+	std::vector<Pair> iron;
 	int width;
 	int height;
 	void MapFill(const std::string& fileName);
@@ -90,6 +91,7 @@ public:
 	Pair RandomUndiscovered();
 	void Discover(int row, int col);
 	Pair FindFrontier();
+	Pair FindIron(Pair location);
 private:
 	void ConnectNodes();
 	struct AStarNode {

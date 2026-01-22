@@ -7,10 +7,10 @@ std::vector<Character> characters;
 Map& map = GetMap();
 Character::Character(){
     pos = { 50, 50 };
-    velocity = { 0, 0 };
-    rotation = 0.0f;
+    //velocity = { 0, 0 };
+    //rotation = 0.0f;
 
-    active = true;
+    //active = true;
     speed = 60.0f;
 
     state = cutTree;
@@ -51,12 +51,26 @@ void Place(){
 void DrawCharacters(){
     for (const Character& c : characters) {
        //cout << c.pos.x << '\n'; 
-        DrawCircle(
-            static_cast<int>(c.pos.x),
-            static_cast<int>(c.pos.y),
-            1,
-            BLUE
-        );
+        switch(c.type){
+        case worker:
+            DrawCircle(
+                static_cast<int>(c.pos.x),
+                static_cast<int>(c.pos.y),
+                1,
+                BLUE
+            );
+            break;
+        case scout:
+            DrawCircle(
+                static_cast<int>(c.pos.x),
+                static_cast<int>(c.pos.y),
+                1,
+                ORANGE
+            );
+            break;
+        
+        }
+        
         //DrawCircle(c.pos.x,c.pos.y,1000,RED);
         //DrawCircle(500,500,1000,RED);
     }
@@ -133,6 +147,21 @@ Task* BuildCutTreeTree(Character* c, Pair destination, Map* m)
 	return root;
 }
 
+Task* BuildUpgradeTree(Character* c,Type t)
+{
+    Selector* root = new Selector();
+    //Sequence* chopSequence = new Sequence();
+    //chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+
+
+    
+    UpgradeTask* upgrade = new UpgradeTask(c,t);
+
+    root->AddChild(upgrade);
+
+    return root;
+}
+
 
 Task* BuildScoutTree(Character* c, Map* m)
 {
@@ -152,10 +181,14 @@ Task* BuildScoutTree(Character* c, Map* m)
 
 void SetTask(){
     for(int i = 0; i < 5;i++){
-	characters[i].behaviourTree = BuildScoutTree(&characters[i],&map);
+        characters[i].type = scout;
+	    characters[i].behaviourTree = BuildScoutTree(&characters[i],&map);
     }
-    for(int j = 5; j < characters.size();j++){
-	characters[j].behaviourTree = BuildCutTreeTree(&characters[j],{97,4},&map);
+    for(int j = 5; j < characters.size()-5;j++){
+	    characters[j].behaviourTree = BuildCutTreeTree(&characters[j],{97,4},&map);
+    }
+    for (int k = characters.size() - 5; k < characters.size(); k++) {
+        characters[k].behaviourTree = BuildUpgradeTree(&characters[k], scout);
     }
 }
 
