@@ -28,6 +28,7 @@ class Building {
 	Building();
 	bool usable;
 	void ProduceCost();
+	void PlaceResource();
 };
 
 void DrawBuildings();

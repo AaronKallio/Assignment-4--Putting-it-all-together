@@ -478,64 +478,6 @@ public:
 }
 };
 
-/*
-class ScoutTask : public Task {
-private:
-    Character* c;
-    Map* map;
-
-    Pair dest = { -1, -1 };
-    bool pathRequested = false;
-
-public:
-    ScoutTask(Character* character, Map* m)
-        : c(character), map(m) {}
-
-    behaviour Run() override
-    {
-        Pair start{
-            static_cast<int>(c->pos.y / 10),
-            static_cast<int>(c->pos.x / 10)
-        };
-
-        // Request new destination if needed
-        if (!pathRequested) {
-            dest = map->RandomUndiscovered();
-
-            if (dest.first == -1)
-                return success; // map fully explored
-
-            c->path.clear();
-            c->currentPathIndex = 0;
-
-            if (!map->AStarSearch(start, dest, c->path, true))
-                return failure;
-
-            pathRequested = true;
-        }
-
-        // Move character
-        c->Update(GetFrameTime());
-
-        // Discover area
-        int r = static_cast<int>(c->pos.y / 10);
-        int ccol = static_cast<int>(c->pos.x / 10);
-        map->Discover(r, ccol);
-
-        // Check arrival
-        Vector2 target{
-            dest.second * 10.0f + 5.0f,
-            dest.first  * 10.0f + 5.0f
-        };
-
-        if (Vector2Distance(c->pos, target) <= 2.5f) {
-            pathRequested = false;
-        }
-
-        return running;
-    }
-};
-*/
 
 
 class ScoutTask : public Task {

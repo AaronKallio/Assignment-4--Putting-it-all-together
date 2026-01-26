@@ -39,13 +39,16 @@ void DrawBuildings(){
 
 void Building::Produce() {
 	if (productionTimer == 0) {
-		productionTimer = 0;
-
+		ProduceCost();
 	}
-
-	if (productionTimer==timeToProduce) {
-		productionTimer = 0;
-
+	if (usable) {
+		if (productionTimer == timeToProduce) {
+			productionTimer = 0;
+			usable = false;
+			PlaceResource();
+			return;
+		}
+		productionTimer+= GetFrameTime();
 	}
 }
 
@@ -114,4 +117,18 @@ void Building::ProduceCost() {
 		return;
 	}
 	usable = false;
+}
+
+void Building::PlaceResource() {
+	switch (type) {
+	case coalMine:
+		gameMap.AddObject(position.first,position.second,ObjectType::Coal);
+		break;
+	case ironSmelter:
+		gameMap.AddObject(position.first, position.second, ObjectType::IronBar);
+		break;
+	case armsmithsForge:
+		gameMap.AddObject(position.first, position.second, ObjectType::Sword);
+		break;
+	};
 }
