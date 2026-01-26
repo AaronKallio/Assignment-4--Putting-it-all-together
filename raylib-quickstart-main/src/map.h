@@ -25,12 +25,17 @@ enum status {
 	unvisited,
 	visited
 };
+
+
 typedef pair<int, int> Pair;
 
 enum class ObjectType {
 	None,
     Tree,
 	ChoppedTree,
+	Coal,
+	Sword,
+	IronBar,
     Ore
 };
 struct WorldObject {

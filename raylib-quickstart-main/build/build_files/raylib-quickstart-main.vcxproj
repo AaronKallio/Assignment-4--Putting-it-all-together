@@ -303,12 +303,14 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\resource_dir.h" />
     <ClInclude Include="..\..\src\ball.h" />
+    <ClInclude Include="..\..\src\building.h" />
     <ClInclude Include="..\..\src\character.h" />
     <ClInclude Include="..\..\src\manager.h" />
     <ClInclude Include="..\..\src\map.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ball.cpp" />
+    <ClCompile Include="..\..\src\building.cpp" />
     <ClCompile Include="..\..\src\character.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\manager.cpp" />

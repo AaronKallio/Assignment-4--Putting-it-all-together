@@ -19,6 +19,7 @@ int main()
     Place();
     SetTask();
     int gameSpeed = 20;
+    int frame = 1;
     
     while (!WindowShouldClose())
     {
@@ -29,7 +30,20 @@ int main()
         for(int i = 0; i < gameSpeed; i++){
             //RunMap();
             //RunCharacters();
+            if (frame==60) {
+                frame = 1;
+            }
+
+            
             RunTask();
+            if (frame ==30) {
+                ReturnToWork();
+            }
+            //if (GetFrameTime()) {
+            //cout << GetFrameTime();
+            //}
+            frame++;
+            
         }
         BeginDrawing();
         ClearBackground(BLACK);

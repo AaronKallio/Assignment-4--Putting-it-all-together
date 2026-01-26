@@ -1,8 +1,9 @@
 #pragma once
 #include "map.h"
 #include "character.h"
+#include "building.h"
 void DrawItemsCollected();
 void SetTask();
 void RunTask();
 void Place();
-
+void ReturnToWork();

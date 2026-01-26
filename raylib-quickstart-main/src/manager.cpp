@@ -1,20 +1,20 @@
 #include "manager.h"
 //int felledTree;
-int coal;
+extern int coal;
 extern int wood;
 extern int ore;
-int ironBar;
-int sword;
+extern int ironBar;
+extern int sword;
 int soldiers;
 int workers;
+int ironMiners;
 int scouts;
 int builders;
 int craftsmen;
-int ironOre;
-int coalMine;
-int armsmith;
-int smelter;
-int trainingCamp;
+int coalMines;
+int armsmiths;
+int smelters;
+int trainingCamps;
 
 void DrawItemsCollected(){
     std::string str1 = "Wood = " + to_string(wood);
@@ -26,7 +26,7 @@ void DrawItemsCollected(){
 }
 extern Map& map;
 extern std::vector<Character> characters;
-
+extern std::vector<Building> buildings;
 
 
 
@@ -43,6 +43,8 @@ void Place() {
     cout << "Characters placed: " << characters.size() << '\n';
 }
 
+
+/*
 void SetTask() {
     for (int i = 0; i < 5; i++) {
         characters[i].type = scout;
@@ -58,9 +60,38 @@ void SetTask() {
         characters[k].behaviourTree = BuildUpgradeTree(&characters[k], scout);
     }
 }
+*/
+void SetTask() {
+    for (int i = 0; i < 5; i++) {
+        scouts++;
+        characters[i].type = scout;
+        characters[i].behaviourTree = BuildUpgradeScoutTree(&characters[i],scout, &map);
+    }
+    for (int j = 5; j < characters.size() - 5; j++) {
+        workers++;
+        characters[j].behaviourTree = BuildCutTreeTree(&characters[j], { 97,4 }, &map);
+    }
+    for (int t = characters.size() - 5; t < characters.size(); t++) {
+        ironMiners++;
+        characters[t].behaviourTree = BuildMineTree(&characters[t], { 96,4 }, &map);
+    }
+}
+
+void ReturnToWork() {
+    for (int i = 0; i < characters.size(); i++) {
+        if (characters[i].state==idle && characters[i].type == worker) {
+            characters[i].state = active;
+            characters[i].behaviourTree->Run();
+       }
+    }
+}
+
+
+
 void RunTask() {
     for (int i = 0; i < characters.size(); i++) {
-        if (characters[i].state != Idle) {
+        if (characters[i].state != idle) {
+            //characters[i].state = active;
             characters[i].behaviourTree->Run();
         }
     }

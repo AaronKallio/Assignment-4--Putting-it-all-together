@@ -14,7 +14,11 @@ int mode = 1;
 double timed;
 std::vector<Map> maps;
 Map theMap;
-
+int wood = 0;
+int ore = 0;
+int coal = 0;
+int ironBar = 0;
+int sword = 0;
 
 namespace {
     const int dRow[8] = {-1, 1, 0, 0, -1, -1, 1, 1};

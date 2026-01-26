@@ -1,8 +1,11 @@
 #include "character.h"
 using namespace std;
+extern int coal;
+extern int wood;
+extern int ore;
+extern int ironBar;
+extern int sword;
 
-int wood = 0;
-int ore = 0;
 std::vector<Character> characters;
 //Map map;
 Map& map = GetMap();
@@ -14,7 +17,7 @@ Character::Character(){
     //active = true;
     speed = 60.0f;
 
-    state = cutTree;
+    state = active;
     type = worker;
 
     currentItem = ObjectType::None;
@@ -67,7 +70,7 @@ void DrawCharacters(){
 }
 void RunCharacters(){
 	for(int i = 0; i < characters.size();i++){
-        if(characters[i].state!=Idle){
+        if(characters[i].state!=idle){
             characters[i].Update(GetFrameTime());
         }
 		//characters[i].Update(GetFrameTime());
@@ -153,6 +156,25 @@ Task* BuildUpgradeTree(Character* c,Type t)
 }
 
 
+
+Task* BuildUpgradeScoutTree(Character* c, Type t, Map* m)
+{
+    Selector* root = new Selector();
+    //Sequence* chopSequence = new Sequence();
+    //chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+    Sequence* scoutSequence = new Sequence();
+    scoutSequence->AddChild(new UpgradeTask(c, t));
+    scoutSequence->AddChild(new ScoutTask(c, m));
+
+    //UpgradeTask* upgrade = new UpgradeTask(c, t);
+    IdleTask* idle = new IdleTask(c);
+
+    root->AddChild(scoutSequence);
+    root->AddChild(idle);
+    return root;
+}
+
+
 Task* BuildScoutTree(Character* c, Map* m)
 {
 	Selector* root = new Selector();
@@ -180,10 +202,10 @@ Task* BuildMineTree(Character* c, Pair destination, Map* m)
     mineSequence->AddChild(new FindIronTask(c, m));
     mineSequence->AddChild(new TravelTask(c, destination, m, false));
     mineSequence->AddChild(new DepositTask(c, m, ObjectType::Ore));
-
+    IdleTask* idle = new IdleTask(c);
 
     root->AddChild(mineSequence);
-    //root->AddChild(idle);
+    root->AddChild(idle);
 
     return root;
 }
@@ -219,5 +241,14 @@ void IncreaseItem(ObjectType item){
     }
     else if (item == ObjectType::Ore) {
         ore++;
+    }
+    else if (item == ObjectType::Coal) {
+        coal++;
+    }
+    else if (item == ObjectType::IronBar) {
+        ironBar++;
+    }
+    else if (item == ObjectType::Sword) {
+        ironBar++;
     }
 }

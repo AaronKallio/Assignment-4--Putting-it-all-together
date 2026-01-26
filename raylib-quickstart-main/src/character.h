@@ -11,8 +11,11 @@
 //int felledTree = 0;
 
 enum State {
-	cutTree,
-	Idle
+	//cutTree,
+	//mine,
+	//scout,
+	active,
+	idle
 };
 enum behaviour {
 	success,
@@ -219,6 +222,10 @@ enum Type{
     worker,
     scout,
     soldier,
+	builder,
+	coalMiner,
+	armSmith,
+	smelter,
     craftman
 
 } ;
@@ -243,7 +250,7 @@ public:
 	Task* behaviourTree = nullptr;
 	DecisionTreeNode* decisionState;
 	int characterNum;
-
+	//bool inTask = false;
 
 	void RequestPath(Map& map, Pair target);
     void Update(float dt);
@@ -264,6 +271,7 @@ Task* BuildScoutTree(Character* c, Map* m);
 Task* BuildCutTreeTree(Character* c, Pair destination, Map* m);
 Task* BuildMineTree(Character* c, Pair destination, Map* m);
 Task* BuildUpgradeTree(Character* c, Type t);
+Task* BuildUpgradeScoutTree(Character* c, Type t, Map* m);
 
 class TravelTask : public Task {
 private:
@@ -465,7 +473,7 @@ public:
         : c(character) {}
 
     behaviour Run() override {
-		c->state = Idle;
+		c->state = idle;
 		return success;
 }
 };
