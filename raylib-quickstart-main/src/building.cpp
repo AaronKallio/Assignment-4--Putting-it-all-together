@@ -2,6 +2,7 @@
 using namespace std;
 
 std::vector<Building> buildings;
+std::vector<Pair> buildZone;
 Map& gameMap = GetMap();
 extern int coal;
 extern int wood;
@@ -131,4 +132,27 @@ void Building::PlaceResource() {
 		gameMap.AddObject(position.first, position.second, ObjectType::Sword);
 		break;
 	};
+}
+
+Pair FindSpot() {
+	for (int i = 0; i < buildZone.size(); i++) {
+		if (gameMap.grid[buildZone[i].first][buildZone[i].second].discovered) {
+			return buildZone[i];
+		}
+	}
+	return {-1,-1};
+}
+
+void MakeBuildZone() {
+	for (int i = 96; i < 98; i++) {
+		for (int j = 1; j < 5; j++) {
+			if ((i!=96&&j!=3)&& (i != 97 && j != 3)&& (i != 96 && j != 4)&& (i != 97 && j != 4)) {
+				buildZone.push_back({i,j});
+			}
+		}
+	}
+}
+
+void MakeNewBuilding(BuildingType build) {
+
 }

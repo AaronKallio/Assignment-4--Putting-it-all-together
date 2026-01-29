@@ -15,6 +15,7 @@ int coalMines;
 int armsmiths;
 int smelters;
 int trainingCamps;
+std::vector<BuildingType> buildList;
 
 void DrawItemsCollected(){
     std::string str1 = "Wood = " + to_string(wood);
@@ -41,6 +42,7 @@ void Place() {
         characters.emplace_back(c);
     }
     cout << "Characters placed: " << characters.size() << '\n';
+    cout << "test " << '\n';
 }
 
 

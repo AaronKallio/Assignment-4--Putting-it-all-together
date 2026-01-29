@@ -61,6 +61,14 @@ void DrawCharacters(){
                 ORANGE
             );
             break;
+        case builder:
+            DrawCircle(
+                static_cast<int>(c.pos.x),
+                static_cast<int>(c.pos.y),
+                1,
+                PURPLE
+            );
+            break;
         
         }
         
@@ -209,6 +217,9 @@ Task* BuildMineTree(Character* c, Pair destination, Map* m)
 
     return root;
 }
+
+
+
 /*
 void SetTask(){
     for(int i = 0; i < 5;i++){

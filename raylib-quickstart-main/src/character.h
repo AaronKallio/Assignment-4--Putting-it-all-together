@@ -6,6 +6,7 @@
 #include <string> 
 #include <random>
 #include "map.h"
+#include "building.h"
 #include "raymath.h"
 #include <iostream> 
 //int felledTree = 0;
@@ -602,3 +603,90 @@ public:
 	}
 };
 
+
+
+
+class BuildSpotTask : public Task {
+private:
+	Character* c;
+	//Pair dest;
+	Map* map;
+	Pair found;
+	Pair notFound = { -1,-1 };
+	bool pathRequested = false;
+
+public:
+	BuildSpotTask(Character* character, Map* m)
+		: c(character), map(m) {
+	}
+
+	behaviour Run() override {
+		Pair start{
+			static_cast<int>(c->pos.y / 10),
+			static_cast<int>(c->pos.x / 10)
+		};
+
+		if (!pathRequested) {
+			c->path.clear();
+			c->currentPathIndex = 0;
+
+			found = FindSpot();
+			//cout << "buddy";
+			if (found == notFound) {
+				//cout << "buddy";
+				pathRequested = false;
+				return failure;
+			}
+			map->AStarSearch(start, found, c->path, false);
+			if (found == notFound || c->path.empty()) {
+				//cout << "buddy";
+				pathRequested = false;
+				return failure;
+			}
+			//bool runLock = map->NodeHasObject(found.second, found.first, ObjectType::Ore,c->characterNum);
+			pathRequested = true;
+		}
+
+		Vector2 dirTest = Vector2Subtract({ (float)found.second * 10 + 5,(float)found.first * 10 + 5 }, c->pos);
+		float distTest = Vector2Length(dirTest);
+		if (distTest <= 2.5f) {
+			pathRequested = false;
+			//map->RemoveItem(static_cast<int>(c->pos.y / 10), static_cast<int>(c->pos.x / 10), c->characterNum, ObjectType::Ore);
+			//c->currentItem = ObjectType::Ore;
+			return success;
+		}
+		c->Update(GetFrameTime());
+		return running;
+	}
+};
+
+
+
+class BuildTask : public Task {
+private:
+	Character* c;
+	Map* map;
+	float elapsed = 0.0f;
+	static constexpr float chopTime = 30.0f;
+	BuildingType b;
+
+public:
+	BuildTask(Character* character, Map* m, BuildingType building)
+		: c(character), map(m), b(building) {
+	}
+
+	behaviour Run() override {
+		// Accumulate time
+		elapsed += GetFrameTime();
+
+		if (elapsed < chopTime) {
+			//DrawText("workin",500,500,50,PURPLE);
+			return running;
+		}
+
+
+
+		elapsed = 0.0f; // reset for next use
+		return success;
+	}
+};
