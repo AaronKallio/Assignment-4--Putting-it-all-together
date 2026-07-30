@@ -274,6 +274,10 @@ Task* BuildMineTree(Character* c, Pair destination, Map* m);
 Task* BuildUpgradeTree(Character* c, Type t);
 Task* BuildUpgradeScoutTree(Character* c, Type t, Map* m);
 
+Task* BuildUpgradeBuilderTree(Character* c, Type t, Map* m, std::vector<BuildingType>* buildingList);
+Task* BuildBuilderTree(Character* c, Type t, Map* m, std::vector<BuildingType>* buildingList);
+Task* BuildCraftsmanTree(Character* c, Type t);
+Task* BuildCraftsmanTravelTree(Character* c, Type t, Map* m, Pair dest);
 class TravelTask : public Task {
 private:
     Character* c;
@@ -605,7 +609,7 @@ public:
 
 
 
-
+/*
 class BuildSpotTask : public Task {
 private:
 	Character* c;
@@ -688,5 +692,142 @@ public:
 
 		elapsed = 0.0f; // reset for next use
 		return success;
+	}
+};
+
+
+*/
+
+
+
+
+
+class BuilderTask : public Task {
+private: Character* c;
+	   Map* map;
+	   std::vector<BuildingType>* list;
+	   Pair dest;
+	   BuildingType building;
+	   bool go = false;
+	   float elapsed = 0.0f;
+	   float buildTime;
+	   bool buildingNow = false;
+	   int prodTime;
+public:
+	BuilderTask(Character* character, Map* m, std::vector<BuildingType>* buildingList)
+		: c(character), map(m), list(buildingList) {
+	}
+	behaviour Run() override {
+		if (list->empty()) {
+			//cout << "fail 1 ";
+			return failure;
+		}
+		if (buildingNow) {
+
+			elapsed += GetFrameTime();
+			//cout << "  " << buildTime << "  ";
+			//cout << buildingNow;
+			if (elapsed < buildTime) {
+				//cout << "running 1 ";
+				//cout << elapsed << "  ";
+				return running;
+			}
+
+			if (elapsed >= buildTime) {
+				MakeNewBuilding(building, prodTime, dest);
+				cout << "success 1 ";
+				return success;
+			}
+		}
+		
+		if (!go) {
+			bool resources = map->UseItems(map->woodLocation,10);
+			if (!resources) {
+				//cout << map->woodLocation.first;
+				//cout << map->woodLocation.second;
+				//cout << "fail 2 ";
+				return failure;
+			}
+			dest = FindSpot();
+			Pair fail = { -1,-1 };
+			if (dest == fail) {
+				//cout << "fail 3 ";
+				return failure;
+			}
+			//building = list->back();
+			building = list->front();
+			switch (building) {
+			case coalMine:
+				map->DeleteItems(map->woodLocation, 10);
+				map->RemoveWood(10);
+				prodTime = 30;
+				buildTime = 60;
+				break;
+			case armsmithsForge:
+				//here
+				map->DeleteItems(map->woodLocation, 10);
+				map->RemoveWood(10);
+				prodTime = 60;
+				buildTime = 180;
+				break;
+			case ironSmelter:
+				map->DeleteItems(map->woodLocation, 10);
+				map->RemoveWood(10);
+				prodTime = 30;
+				buildTime = 120;
+				break;
+			case trainingCamp:
+				map->DeleteItems(map->woodLocation, 10);
+				map->RemoveWood(10);
+				prodTime = 60;
+				buildTime = 120;
+				break;
+			}
+
+			
+			//found = map->BFS(start, ObjectType::Tree, c->path, c->characterNum);
+			cout << list->size();
+			c->path.clear();
+			c->currentPathIndex = 0;
+			//list->pop_back();
+			list->erase(list->begin());
+			go = true;
+
+
+			Pair start{
+			static_cast<int>(c->pos.y / 10),
+			static_cast<int>(c->pos.x / 10)
+			};
+
+			map->AStarSearch(start, dest, c->path, false);
+		}
+		
+
+		Vector2 dirTest = Vector2Subtract({ (float)dest.second * 10 + 5,(float)dest.first * 10 + 5 }, c->pos);
+		float distTest = Vector2Length(dirTest);
+
+		DrawCircle(
+			static_cast<int>(c->pos.x),
+			static_cast<int>(c->pos.y),
+			300,
+			PINK
+		);
+		//cout << c->pos.x<<" ";
+		//cout << c->pos.y << " ";
+		if (distTest <= 2.5f) {
+			buildingNow = true;
+			//cout << "running 2";
+			return running;
+		}
+		c->Update(GetFrameTime());
+		//cout << "running 3";
+		DrawCircle(
+			static_cast<int>(dest.first * 10 + 5),
+			static_cast<int>(dest.second * 10 + 5),
+			200,
+			ORANGE
+		);
+		return running;
+	
 	}
 };

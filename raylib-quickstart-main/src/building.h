@@ -34,4 +34,5 @@ class Building {
 void DrawBuildings();
 Pair FindSpot();
 void MakeBuildZone();
-void MakeNewBuilding(BuildingType build);
+void MakeNewBuilding(BuildingType build, int prodTime, Pair dest);
+void FillList();

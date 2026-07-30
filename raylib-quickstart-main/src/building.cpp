@@ -3,6 +3,7 @@ using namespace std;
 
 std::vector<Building> buildings;
 std::vector<Pair> buildZone;
+std::vector<BuildingType> buildList;
 Map& gameMap = GetMap();
 extern int coal;
 extern int wood;
@@ -10,7 +11,7 @@ extern int ore;
 extern int ironBar;
 extern int sword;
 Building::Building(){
-	position;
+	position = {-1,-1};
 	worker = -1;
 	type;
 	productionTimer = 0;
@@ -24,16 +25,16 @@ void DrawBuildings(){
 	}
 	for (int i = 0; i < buildings.size(); i++) {
 		if (buildings[i].type == coalMine) {
-			DrawRectangle(buildings[i].position.first, buildings[i].position.second, 6, 6, BLACK);
+			DrawRectangle(buildings[i].position.second * 10 + 5, buildings[i].position.first * 10 + 5, 6, 6, BLACK);
 		}
 		else if (buildings[i].type == armsmithsForge) {
-			DrawRectangle(buildings[i].position.first, buildings[i].position.second, 6, 6, GRAY);
+			DrawRectangle(buildings[i].position.second * 10 + 5, buildings[i].position.first * 10 + 5, 6, 6, GRAY);
 		}
 		else if (buildings[i].type == ironSmelter) {
-			DrawRectangle(buildings[i].position.first, buildings[i].position.second, 6, 6, RED);
+			DrawRectangle(buildings[i].position.second * 10 + 5, buildings[i].position.first * 10 + 5, 6, 6, RED);
 		}
 		else if (buildings[i].type == trainingCamp) {
-			DrawRectangle(buildings[i].position.first, buildings[i].position.second, 6, 6, YELLOW);
+			DrawRectangle(buildings[i].position.second * 10 + 5, buildings[i].position.first * 10 + 5, 6, 6, YELLOW);
 		}
 	}
 };
@@ -135,24 +136,71 @@ void Building::PlaceResource() {
 }
 
 Pair FindSpot() {
+	Pair invalidPos = {-1,-1};
 	for (int i = 0; i < buildZone.size(); i++) {
+		//cout << "bruv";
 		if (gameMap.grid[buildZone[i].first][buildZone[i].second].discovered) {
-			return buildZone[i];
+			Pair loc = buildZone[i];
+			buildZone.erase(buildZone.begin() + i);
+			return loc;
 		}
 	}
+	//cout << "bruv";
 	return {-1,-1};
 }
 
 void MakeBuildZone() {
-	for (int i = 96; i < 98; i++) {
-		for (int j = 1; j < 5; j++) {
-			if ((i!=96&&j!=3)&& (i != 97 && j != 3)&& (i != 96 && j != 4)&& (i != 97 && j != 4)) {
-				buildZone.push_back({i,j});
-			}
-		}
-	}
+	//for (int i = 96; i < 98; i++) {
+	//	for (int j = 1; j < 5; j++) {
+	//		if ((i!=96&&j!=3)&& (i != 97 && j != 3)&& (i != 96 && j != 4)&& (i != 97 && j != 4)) {
+	//			buildZone.push_back({i,j});
+	//		}
+	//	}
+	//}
+	buildZone.push_back({97,3});
+	buildZone.push_back({ 96,3 });
+	buildZone.push_back({ 95,3 });
+	buildZone.push_back({ 94,3 });
+	buildZone.push_back({ 93,3 });
+	buildZone.push_back({ 97,2 });
+	buildZone.push_back({ 96,2 });
+	buildZone.push_back({ 95,2 });
+	buildZone.push_back({ 94,2 });
+	buildZone.push_back({ 93,2 });
+	buildZone.push_back({ 97,1 });
+	buildZone.push_back({ 96,1 });
+	buildZone.push_back({ 95,1 });
+	buildZone.push_back({ 94,1 });
+	buildZone.push_back({ 93,1 });
+	cout << buildZone.size()<<" yello";
 }
 
-void MakeNewBuilding(BuildingType build) {
+void MakeNewBuilding(BuildingType build, int prodTime, Pair dest) {
+	//Pair pos = FindSpot();
+	buildings.push_back(Building());
+	buildings[buildings.size() - 1].position = dest;
+	buildings[buildings.size() - 1].type = build;
+	buildings[buildings.size() - 1].timeToProduce = prodTime;
+}
+
+void FillList() {
+	//buildList.push_back(trainingCamp);
+	//buildList.push_back(armsmithsForge);
+	//buildList.push_back(ironSmelter);
+	//buildList.push_back(coalMine);
+
+
+	buildList.push_back(coalMine);
+	buildList.push_back(coalMine);
+	buildList.push_back(coalMine);
+	buildList.push_back(ironSmelter);
+	buildList.push_back(ironSmelter);
+	buildList.push_back(ironSmelter);
+	buildList.push_back(armsmithsForge);
+	buildList.push_back(armsmithsForge);
+	//buildList.push_back(armsmithsForge);
+	buildList.push_back(trainingCamp);
+	buildList.push_back(trainingCamp);
+	//buildList.push_back(trainingCamp);
 
 }

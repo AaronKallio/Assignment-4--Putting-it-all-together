@@ -69,6 +69,14 @@ void DrawCharacters(){
                 PURPLE
             );
             break;
+        case craftman:
+            DrawCircle(
+                static_cast<int>(c.pos.x),
+                static_cast<int>(c.pos.y),
+                1,
+                MAGENTA
+            );
+            break;
         
         }
         
@@ -181,6 +189,75 @@ Task* BuildUpgradeScoutTree(Character* c, Type t, Map* m)
     root->AddChild(idle);
     return root;
 }
+
+
+Task* BuildUpgradeBuilderTree(Character* c, Type t, Map* m, std::vector<BuildingType>* buildingList)
+{
+    Selector* root = new Selector();
+    //Sequence* chopSequence = new Sequence();
+    //chopSequence -> AddChild(new TravelTask(c,destination,m)); 
+    IdleTask* idle = new IdleTask(c);
+    Sequence* buildSequence = new Sequence();
+    buildSequence->AddChild(new UpgradeTask(c, t));
+    buildSequence->AddChild(new BuilderTask(c, m, buildingList));
+    buildSequence->AddChild(new IdleTask(c));
+    //UpgradeTask* upgrade = new UpgradeTask(c, t);
+    //IdleTask* idle = new IdleTask(c);
+
+    root->AddChild(buildSequence);
+    root->AddChild(idle);
+    return root;
+}
+
+
+
+Task* BuildBuilderTree(Character* c, Type t, Map* m, std::vector<BuildingType>* buildingList)
+{
+    Selector* root = new Selector();
+    IdleTask* idle = new IdleTask(c);
+    Sequence* buildSequence = new Sequence();
+    buildSequence->AddChild(new BuilderTask(c, m, buildingList));
+    buildSequence->AddChild(new IdleTask(c));
+    
+    root->AddChild(buildSequence);
+    root->AddChild(idle);
+    return root;
+}
+
+Task* BuildCraftsmanTree(Character* c, Type t)
+{
+    Selector* root = new Selector();
+    IdleTask* idle = new IdleTask(c);
+    Sequence* buildSequence = new Sequence();
+    buildSequence->AddChild(new UpgradeTask(c, t));
+    //buildSequence->AddChild(new BuilderTask(c, m, buildingList));
+    buildSequence->AddChild(new IdleTask(c));
+
+    root->AddChild(buildSequence);
+    root->AddChild(idle);
+    return root;
+}
+
+
+Task* BuildCraftsmanTravelTree(Character* c, Type t, Map* m, Pair dest)
+{
+    Selector* root = new Selector();
+    IdleTask* idle = new IdleTask(c);
+    Sequence* buildSequence = new Sequence();
+
+    //buildSequence->AddChild(new UpgradeTask(c, t));
+    //buildSequence->AddChild(new BuilderTask(c, m, buildingList));
+    
+    buildSequence->AddChild(new TravelTask(c, dest, m, false));
+    buildSequence->AddChild(new IdleTask(c));
+    root->AddChild(buildSequence);
+    root->AddChild(idle);
+    return root;
+}
+
+
+
+
 
 
 Task* BuildScoutTree(Character* c, Map* m)

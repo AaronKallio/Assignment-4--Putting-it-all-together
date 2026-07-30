@@ -18,6 +18,8 @@ int main()
     FillMap();
     Place();
     SetTask();
+    MakeBuildZone();
+    FillList();
     int gameSpeed = 20;
     int frame = 1;
     
@@ -48,8 +50,10 @@ int main()
         BeginDrawing();
         ClearBackground(BLACK);
         RunMap();
+        DrawBuildings();
         DrawCharacters();
         DrawItemsCollected();
+        
         //RunMap();
         //DrawCharacters();
         //RunTask();

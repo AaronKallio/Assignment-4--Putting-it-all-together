@@ -97,6 +97,13 @@ public:
 	void Discover(int row, int col);
 	Pair FindFrontier();
 	Pair FindIron(Pair location, int characterNum);
+
+
+	bool UseItems(Pair location, int amount);
+	Pair woodLocation = { 97,4 };
+	Pair ironLocation = { 96,4 };
+	void DeleteItems(Pair location, int amount);
+	void RemoveWood(int amount);
 private:
 	void ConnectNodes();
 	struct AStarNode {

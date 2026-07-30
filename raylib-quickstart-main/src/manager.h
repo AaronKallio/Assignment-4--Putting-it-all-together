@@ -7,3 +7,5 @@ void SetTask();
 void RunTask();
 void Place();
 void ReturnToWork();
+void CraftmenAssign();
+//std::vector<BuildingType> buildingList;

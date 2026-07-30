@@ -39,7 +39,9 @@ namespace {
 
 
 void FillMap(){
-	theMap.MapFill("src/MapSimulation.txt");
+    //ofstream MyFile("filename.txt");
+    //MyFile.close();
+	theMap.MapFill("MapSimulation.txt");
 }
 
 void RunMap() {
@@ -62,7 +64,7 @@ void Map::MapFill(const std::string& fileName) {
 
     std::ifstream file(fileName);
     if (!file.is_open()) {
-        //cout << "bruh\n";
+        cout << "bruh\n";
         return;
     }
 
@@ -717,4 +719,30 @@ Pair Map::FindIron(Pair location, int characterNum) {
     }
 
     return { -1,-1 };
+}
+
+
+bool Map::UseItems(Pair location, int amount) {
+    //std::vector<int> deletes;
+    //for (int i = 0; i < grid[location.first][location.second].objects.size()-1;i++) {
+        if (grid[location.first][location.second].objects.size()>=amount) {
+            //for (int i = 0; i < amount;i++) {
+            //    grid[location.first][location.second].objects.pop_back();
+            //}
+            return true;
+        }
+        else {
+            return false;
+        }
+}
+
+void Map::DeleteItems(Pair location, int amount) {  
+        for (int i = 0; i < amount;i++) {
+            grid[location.first][location.second].objects.pop_back();
+
+        }
+}
+
+void Map::RemoveWood(int amount) {
+    wood -= amount;
 }
