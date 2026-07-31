@@ -256,6 +256,10 @@ public:
 	void RequestPath(Map& map, Pair target);
     void Update(float dt);
 	Character();
+
+
+	Pair soldierGather = { 97,4 };
+	Pair trainingGroundPos = { 97,2 };
 	//void FSM();
 	//Pair TreeSearch(Map& m);
 
@@ -278,6 +282,10 @@ Task* BuildUpgradeBuilderTree(Character* c, Type t, Map* m, std::vector<Building
 Task* BuildBuilderTree(Character* c, Type t, Map* m, std::vector<BuildingType>* buildingList);
 Task* BuildCraftsmanTree(Character* c, Type t);
 Task* BuildCraftsmanTravelTree(Character* c, Type t, Map* m, Pair dest);
+
+Task* BuildSoldierTree(Character* c, Map* m);
+
+
 class TravelTask : public Task {
 private:
     Character* c;
@@ -532,17 +540,17 @@ private:
 	Character* c;
 	//Map* map;
 	float elapsed = 0.0f;
-	static constexpr float upgradeTime = 60.0f;
+	 float u = 60.0f;
 	Type t;
 
 public:
-	UpgradeTask(Character* character, Type desiredType)
-		: c(character), t(desiredType){
+	UpgradeTask(Character* character, Type desiredType, int upgradeTime)
+		: c(character), t(desiredType), u(upgradeTime){
 	}
 
 	behaviour Run() override {
 		elapsed += GetFrameTime();
-		if (elapsed < upgradeTime) {
+		if (elapsed < u) {
 			return running;
 		}
 		elapsed = 0.0f; // reset for next use
@@ -735,7 +743,7 @@ public:
 
 			if (elapsed >= buildTime) {
 				MakeNewBuilding(building, prodTime, dest);
-				cout << "success 1 ";
+				//cout << "success 1 ";
 				return success;
 			}
 		}
@@ -758,29 +766,42 @@ public:
 			building = list->front();
 			switch (building) {
 			case coalMine:
+				DeleteFromZone(dest);
 				map->DeleteItems(map->woodLocation, 10);
 				map->RemoveWood(10);
 				prodTime = 30;
 				buildTime = 60;
 				break;
 			case armsmithsForge:
-				//here
+
+				if (!map->UseItems(map->barLocation, 3)) {
+					std::cout << "fails";
+					return failure;
+				}
+				
+				DeleteFromZone(dest);
 				map->DeleteItems(map->woodLocation, 10);
+				map->DeleteItems(map->barLocation, 3);
 				map->RemoveWood(10);
+				map->RemoveBar(3);
 				prodTime = 60;
 				buildTime = 180;
 				break;
 			case ironSmelter:
+				//cout << " brother buddy ";
+				DeleteFromZone(dest);
 				map->DeleteItems(map->woodLocation, 10);
 				map->RemoveWood(10);
 				prodTime = 30;
 				buildTime = 120;
 				break;
 			case trainingCamp:
+				DeleteFromZone(dest);
 				map->DeleteItems(map->woodLocation, 10);
 				map->RemoveWood(10);
 				prodTime = 60;
 				buildTime = 120;
+				c->trainingGroundPos = dest;
 				break;
 			}
 
@@ -829,5 +850,26 @@ public:
 		);
 		return running;
 	
+	}
+};
+
+class SoldierTask : public Task {
+private:
+	Character* c;
+	//Pair dest;
+	Map* map;
+	//ObjectType item;
+
+public:
+	SoldierTask(Character* character, Map* m)
+		: c(character), map(m) {
+	}
+
+	behaviour Run() override {
+
+		map->DeleteItems(map->swordLocation, 1);
+		map->RemoveSword(1);
+		return success;
+
 	}
 };

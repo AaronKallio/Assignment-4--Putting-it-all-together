@@ -164,7 +164,7 @@ Task* BuildUpgradeTree(Character* c,Type t)
 
 
     
-    UpgradeTask* upgrade = new UpgradeTask(c,t);
+    UpgradeTask* upgrade = new UpgradeTask(c,t, 60);
 
     root->AddChild(upgrade);
 
@@ -179,7 +179,7 @@ Task* BuildUpgradeScoutTree(Character* c, Type t, Map* m)
     //Sequence* chopSequence = new Sequence();
     //chopSequence -> AddChild(new TravelTask(c,destination,m)); 
     Sequence* scoutSequence = new Sequence();
-    scoutSequence->AddChild(new UpgradeTask(c, t));
+    scoutSequence->AddChild(new UpgradeTask(c, t, 60));
     scoutSequence->AddChild(new ScoutTask(c, m));
 
     //UpgradeTask* upgrade = new UpgradeTask(c, t);
@@ -198,7 +198,7 @@ Task* BuildUpgradeBuilderTree(Character* c, Type t, Map* m, std::vector<Building
     //chopSequence -> AddChild(new TravelTask(c,destination,m)); 
     IdleTask* idle = new IdleTask(c);
     Sequence* buildSequence = new Sequence();
-    buildSequence->AddChild(new UpgradeTask(c, t));
+    buildSequence->AddChild(new UpgradeTask(c, t,  120));
     buildSequence->AddChild(new BuilderTask(c, m, buildingList));
     buildSequence->AddChild(new IdleTask(c));
     //UpgradeTask* upgrade = new UpgradeTask(c, t);
@@ -229,7 +229,7 @@ Task* BuildCraftsmanTree(Character* c, Type t)
     Selector* root = new Selector();
     IdleTask* idle = new IdleTask(c);
     Sequence* buildSequence = new Sequence();
-    buildSequence->AddChild(new UpgradeTask(c, t));
+    buildSequence->AddChild(new UpgradeTask(c, t, 120));
     //buildSequence->AddChild(new BuilderTask(c, m, buildingList));
     buildSequence->AddChild(new IdleTask(c));
 
@@ -290,6 +290,27 @@ Task* BuildMineTree(Character* c, Pair destination, Map* m)
     IdleTask* idle = new IdleTask(c);
 
     root->AddChild(mineSequence);
+    root->AddChild(idle);
+
+    return root;
+}
+
+
+
+Task* BuildSoldierTree(Character* c, Map* m) {
+
+    Selector* root = new Selector();
+    Sequence* soldierSequence = new Sequence();
+    IdleTask* idle = new IdleTask(c);
+
+
+    soldierSequence->AddChild(new TravelTask(c, c->trainingGroundPos, m, false));
+    soldierSequence->AddChild(new UpgradeTask(c, soldier, 60));
+    soldierSequence->AddChild(new SoldierTask(c,m));
+    soldierSequence->AddChild(new TravelTask(c, c->soldierGather, m, false));
+    soldierSequence->AddChild(idle);
+
+    root->AddChild(soldierSequence);
     root->AddChild(idle);
 
     return root;

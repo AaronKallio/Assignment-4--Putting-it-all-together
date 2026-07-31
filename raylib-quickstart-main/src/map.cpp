@@ -192,6 +192,31 @@ void Map::DrawMap() {
                 //    1,
                 //    RED);
             }
+            else if (current.objects[j].type == ObjectType::Coal && current.discovered == true) {
+                DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, BLACK);
+                //DrawCircle(
+                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
+                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
+                //    1,
+                //    RED);
+            }
+            else if (current.objects[j].type == ObjectType::IronBar && current.discovered == true) {
+                DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, DARKGRAY);
+                //DrawCircle(
+                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
+                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
+                //    1,
+                //    RED);
+            }
+            else if (current.objects[j].type == ObjectType::Sword && current.discovered == true) {
+                DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, SKYBLUE);
+                //DrawCircle(
+                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
+                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
+                //    1,
+                //    RED);
+            }
+
             //cout<<"--------------"<<'\n';
         }
 		}
@@ -745,4 +770,12 @@ void Map::DeleteItems(Pair location, int amount) {
 
 void Map::RemoveWood(int amount) {
     wood -= amount;
+}
+
+void Map::RemoveBar(int amount) {
+    ironBar -= amount;
+}
+
+void Map::RemoveSword(int amount) {
+    sword -= amount;
 }

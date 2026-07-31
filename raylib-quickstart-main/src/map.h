@@ -102,8 +102,13 @@ public:
 	bool UseItems(Pair location, int amount);
 	Pair woodLocation = { 97,4 };
 	Pair ironLocation = { 96,4 };
+	Pair coalLocation = { 95,4 };
+	Pair barLocation = { 94,4 };
+	Pair swordLocation = { 93,4 };
 	void DeleteItems(Pair location, int amount);
 	void RemoveWood(int amount);
+	void RemoveBar(int amount);
+	void RemoveSword(int amount);
 private:
 	void ConnectNodes();
 	struct AStarNode {

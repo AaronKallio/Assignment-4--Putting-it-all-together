@@ -8,4 +8,6 @@ void RunTask();
 void Place();
 void ReturnToWork();
 void CraftmenAssign();
+void AssignSoldiers();
+void SoldierSlots();
 //std::vector<BuildingType> buildingList;

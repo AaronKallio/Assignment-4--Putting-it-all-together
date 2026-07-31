@@ -20,9 +20,9 @@ int main()
     SetTask();
     MakeBuildZone();
     FillList();
-    int gameSpeed = 20;
+    AssignSoldiers();
+    int gameSpeed = 100;
     int frame = 1;
-    
     while (!WindowShouldClose())
     {
         //ball.Update();
@@ -36,10 +36,11 @@ int main()
                 frame = 1;
             }
 
-            
+            ProduceItems();
             RunTask();
             if (frame ==30) {
                 ReturnToWork();
+                SoldierSlots();
             }
             //if (GetFrameTime()) {
             //cout << GetFrameTime();

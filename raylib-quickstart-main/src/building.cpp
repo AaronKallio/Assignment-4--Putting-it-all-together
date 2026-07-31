@@ -20,10 +20,12 @@ Building::Building(){
 }
 
 void DrawBuildings(){
+	//cout << buildings.size() << " ";
 	if (buildings.size()==0) {
 		return;
 	}
 	for (int i = 0; i < buildings.size(); i++) {
+		//cout << buildings[i].type;
 		if (buildings[i].type == coalMine) {
 			DrawRectangle(buildings[i].position.second * 10 + 5, buildings[i].position.first * 10 + 5, 6, 6, BLACK);
 		}
@@ -37,6 +39,7 @@ void DrawBuildings(){
 			DrawRectangle(buildings[i].position.second * 10 + 5, buildings[i].position.first * 10 + 5, 6, 6, YELLOW);
 		}
 	}
+	//cout << " ";
 };
 
 void Building::Produce() {
@@ -44,7 +47,7 @@ void Building::Produce() {
 		ProduceCost();
 	}
 	if (usable) {
-		if (productionTimer == timeToProduce) {
+		if (productionTimer >= timeToProduce) {
 			productionTimer = 0;
 			usable = false;
 			PlaceResource();
@@ -55,13 +58,15 @@ void Building::Produce() {
 }
 
 void Building::ProduceCost() {
-	if (type == coalMine && wood >= 2) {
-		auto& objects = gameMap.grid[97][4].objects;
+	if (type == coalMine && wood >= 17) {
+		//cout << " i am here number 1 ";
+		auto& objects = gameMap.grid[gameMap.woodLocation.first][gameMap.woodLocation.second].objects;
 		int removed = 0;
-		for (int i = objects.size() - 1; i >= 0 && removed < 2; --i) {
+		for (int i = objects.size() - 1; i >= 0 && removed < 2; i--) {
 			if (objects[i].locked == -1) {
 				objects.erase(objects.begin() + i);
 				removed++;
+				//cout << " i am here number 2 ";
 			}
 		}
 		if (removed == 2) {
@@ -72,16 +77,16 @@ void Building::ProduceCost() {
 	}
 
 	else if (type == ironSmelter && coal >= 3&&ore>=2) {
-		auto& objectsOre = gameMap.grid[97][4].objects;
-		auto& objectsCoal = gameMap.grid[97][3].objects;
+		auto& objectsOre = gameMap.grid[gameMap.ironLocation.first][gameMap.ironLocation.second].objects;
+		auto& objectsCoal = gameMap.grid[gameMap.coalLocation.first][gameMap.coalLocation.second].objects;
 		int removed = 0;
-		for (int i = objectsOre.size() - 1; i >= 0 && removed < 2; --i) {
+		for (int i = objectsOre.size() - 1; i >= 0 && removed < 2; i--) {
 			if (objectsOre[i].locked == -1) {
 				objectsOre.erase(objectsOre.begin() + i);
 				removed++;
 			}
 		}
-		for (int i = objectsCoal.size() - 1; i >= 0 && removed < 5; --i) {
+		for (int i = objectsCoal.size() - 1; i >= 0 && removed < 5; i--) {
 			if (objectsCoal[i].locked == -1) {
 				objectsCoal.erase(objectsCoal.begin() + i);
 				removed++;
@@ -96,16 +101,16 @@ void Building::ProduceCost() {
 	}
 
 	else if (type == armsmithsForge && coal >= 2 && ironBar >= 1) {
-		auto& objectsIron = gameMap.grid[96][3].objects;
-		auto& objectsCoal = gameMap.grid[97][3].objects;
+		auto& objectsIron = gameMap.grid[gameMap.barLocation.first][gameMap.barLocation.second].objects;
+		auto& objectsCoal = gameMap.grid[gameMap.coalLocation.first][gameMap.coalLocation.second].objects;
 		int removed = 0;
-		for (int i = objectsIron.size() - 1; i >= 0 && removed < 1; --i) {
+		for (int i = objectsIron.size() - 1; i >= 0 && removed < 1; i--) {
 			if (objectsIron[i].locked == -1) {
 				objectsIron.erase(objectsIron.begin() + i);
 				removed++;
 			}
 		}
-		for (int i = objectsCoal.size() - 1; i >= 0 && removed < 3; --i) {
+		for (int i = objectsCoal.size() - 1; i >= 0 && removed < 3; i--) {
 			if (objectsCoal[i].locked == -1) {
 				objectsCoal.erase(objectsCoal.begin() + i);
 				removed++;
@@ -113,7 +118,7 @@ void Building::ProduceCost() {
 		}
 		if (removed == 3) {
 			ironBar --;
-			coal -= 3;
+			coal -= 2;
 		}
 		usable = true;
 		return;
@@ -124,39 +129,47 @@ void Building::ProduceCost() {
 void Building::PlaceResource() {
 	switch (type) {
 	case coalMine:
-		gameMap.AddObject(position.first,position.second,ObjectType::Coal);
+		gameMap.AddObject(gameMap.coalLocation.first, gameMap.coalLocation.second,ObjectType::Coal);
+		coal++;
+		//cout << " buddy i am producing bruh ";
 		break;
 	case ironSmelter:
-		gameMap.AddObject(position.first, position.second, ObjectType::IronBar);
+		gameMap.AddObject(gameMap.barLocation.first, gameMap.barLocation.second, ObjectType::IronBar);
+		ironBar++;
 		break;
 	case armsmithsForge:
-		gameMap.AddObject(position.first, position.second, ObjectType::Sword);
+		gameMap.AddObject(gameMap.swordLocation.first, gameMap.swordLocation.second, ObjectType::Sword);
+		sword++;
 		break;
 	};
 }
 
 Pair FindSpot() {
 	Pair invalidPos = {-1,-1};
+	cout << buildZone.size();
 	for (int i = 0; i < buildZone.size(); i++) {
-		//cout << "bruv";
 		if (gameMap.grid[buildZone[i].first][buildZone[i].second].discovered) {
 			Pair loc = buildZone[i];
-			buildZone.erase(buildZone.begin() + i);
+			//buildZone.erase(buildZone.begin() + i);
 			return loc;
 		}
 	}
 	//cout << "bruv";
-	return {-1,-1};
+	return invalidPos;
+}
+
+
+void DeleteFromZone(Pair pos) {
+	for (int i = 0; i < buildZone.size(); i++) {
+		if (buildZone[i] == pos) {
+			buildZone.erase(buildZone.begin() + i);
+			return;
+		}
+	}
 }
 
 void MakeBuildZone() {
-	//for (int i = 96; i < 98; i++) {
-	//	for (int j = 1; j < 5; j++) {
-	//		if ((i!=96&&j!=3)&& (i != 97 && j != 3)&& (i != 96 && j != 4)&& (i != 97 && j != 4)) {
-	//			buildZone.push_back({i,j});
-	//		}
-	//	}
-	//}
+	
 	buildZone.push_back({97,3});
 	buildZone.push_back({ 96,3 });
 	buildZone.push_back({ 95,3 });
@@ -172,7 +185,7 @@ void MakeBuildZone() {
 	buildZone.push_back({ 95,1 });
 	buildZone.push_back({ 94,1 });
 	buildZone.push_back({ 93,1 });
-	cout << buildZone.size()<<" yello";
+
 }
 
 void MakeNewBuilding(BuildingType build, int prodTime, Pair dest) {
@@ -192,15 +205,22 @@ void FillList() {
 
 	buildList.push_back(coalMine);
 	buildList.push_back(coalMine);
-	buildList.push_back(coalMine);
-	buildList.push_back(ironSmelter);
+	//buildList.push_back(coalMine);
+	//buildList.push_back(ironSmelter);
 	buildList.push_back(ironSmelter);
 	buildList.push_back(ironSmelter);
 	buildList.push_back(armsmithsForge);
-	buildList.push_back(armsmithsForge);
+	//buildList.push_back(armsmithsForge);
 	//buildList.push_back(armsmithsForge);
 	buildList.push_back(trainingCamp);
 	buildList.push_back(trainingCamp);
 	//buildList.push_back(trainingCamp);
 
+}
+
+void ProduceItems() {
+
+	for (int i = 0; i < buildings.size(); i++) {
+		buildings[i].Produce();
+	}
 }

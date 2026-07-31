@@ -5,19 +5,24 @@ extern int wood;
 extern int ore;
 extern int ironBar;
 extern int sword;
+
 int soldiers;
 int workers;
 int ironMiners;
 int scouts;
 int builders;
 int craftsmen;
-int coalMines;
-int armsmiths;
-int smelters;
-int trainingCamps;
-
+//int coalMines;
+//int armsmiths;
+//int smelters;
+//int trainingCamps;
+int swordsForUse = 0;
 int buildingCount = 0;
-int workerForBuilding = 27;
+int workerForBuilding = 12;
+
+std::vector<int> futureSoldiers;
+
+
 void DrawItemsCollected(){
     std::string str1 = "Wood = " + to_string(wood);
 	const char* cstr1 = str1.c_str();
@@ -75,14 +80,14 @@ void SetTask() {
 */
 void SetTask() {
     
-    for (int j = 0; j < 27; j++) {
+    for (int j = 0; j < 12; j++) {
         workers++;
         characters[j].behaviourTree = BuildCutTreeTree(&characters[j], map.woodLocation, &map);
     }
 
 
-    for (int j = 27; j < 35; j++) {
-        workers++;
+    for (int j = 12; j < 17; j++) {
+        craftsmen++;
         characters[j].behaviourTree = BuildCraftsmanTree(&characters[j], craftman);
     }
 
@@ -91,13 +96,13 @@ void SetTask() {
     //    characters[t].behaviourTree = BuildMineTree(&characters[t], map.ironLocation, &map);
     //}
     builders++;
-    characters[35].behaviourTree = BuildUpgradeBuilderTree(&characters[35], builder, &map, &buildList);
+    characters[17].behaviourTree = BuildUpgradeBuilderTree(&characters[17], builder, &map, &buildList);
 
-    for (int t = 36; t < 45; t++) {
+    for (int t = 18; t < 30; t++) {
         ironMiners++;
         characters[t].behaviourTree = BuildMineTree(&characters[t], map.ironLocation, &map);
     }
-    for (int i = 45; i < 50; i++) {
+    for (int i = 30; i < 50; i++) {
         scouts++;
         characters[i].type = scout;
         characters[i].behaviourTree = BuildUpgradeScoutTree(&characters[i], scout, &map);
@@ -109,7 +114,8 @@ void ReturnToWork() {
         if (characters[i].state==idle && (characters[i].type == worker || characters[i].type == builder)) {
 
             if (characters[i].type == builder) {
-                characters[i].behaviourTree = BuildBuilderTree(&characters[35], builder, &map, &buildList);
+                //cout << "bruhv";
+                characters[i].behaviourTree = BuildBuilderTree(&characters[17], builder, &map, &buildList);
             }
 
             characters[i].state = active;
@@ -132,7 +138,7 @@ void RunTask() {
 
 void CraftmenAssign() {
     if (buildingCount< buildings.size()) {
-        cout << "buns";
+        //cout << "buns";
         buildings[buildingCount].worker = workerForBuilding;
         characters[workerForBuilding].behaviourTree = BuildCraftsmanTravelTree(&characters[workerForBuilding], builder, &map,
             { buildings[buildingCount].position.first, buildings[buildingCount].position.second});
@@ -140,5 +146,27 @@ void CraftmenAssign() {
         characters[workerForBuilding].behaviourTree->Run();
         buildingCount++;
         workerForBuilding++;
+    }
+}
+
+
+void AssignSoldiers() {
+    for (int i = 0; i < 10; i++) {
+        futureSoldiers.push_back(i);
+    }
+    for (int j = 18; j < 28; j++) {
+        futureSoldiers.push_back(j);
+    }
+
+}
+
+void SoldierSlots() {
+    if (sword>=20) {
+        //soldiers++;
+        //swordsForUse 
+        for (int i = 0; i < futureSoldiers.size(); i++) {
+            soldiers++;
+            characters[futureSoldiers[i]].behaviourTree = BuildSoldierTree(&characters[futureSoldiers[i]], &map);
+        }
     }
 }
