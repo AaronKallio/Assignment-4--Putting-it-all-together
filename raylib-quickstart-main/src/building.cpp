@@ -146,7 +146,7 @@ void Building::PlaceResource() {
 
 Pair FindSpot() {
 	Pair invalidPos = {-1,-1};
-	cout << buildZone.size();
+	//cout << buildZone.size();
 	for (int i = 0; i < buildZone.size(); i++) {
 		if (gameMap.grid[buildZone[i].first][buildZone[i].second].discovered) {
 			Pair loc = buildZone[i];

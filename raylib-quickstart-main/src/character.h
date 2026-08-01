@@ -258,7 +258,7 @@ public:
 	Character();
 
 
-	Pair soldierGather = { 97,4 };
+	Pair soldierGather = { 93,8 };
 	Pair trainingGroundPos = { 97,2 };
 	//void FSM();
 	//Pair TreeSearch(Map& m);
@@ -775,7 +775,7 @@ public:
 			case armsmithsForge:
 
 				if (!map->UseItems(map->barLocation, 3)) {
-					std::cout << "fails";
+					//std::cout << "fails";
 					return failure;
 				}
 				
@@ -807,7 +807,7 @@ public:
 
 			
 			//found = map->BFS(start, ObjectType::Tree, c->path, c->characterNum);
-			cout << list->size();
+			//cout << list->size();
 			c->path.clear();
 			c->currentPathIndex = 0;
 			//list->pop_back();
@@ -827,12 +827,7 @@ public:
 		Vector2 dirTest = Vector2Subtract({ (float)dest.second * 10 + 5,(float)dest.first * 10 + 5 }, c->pos);
 		float distTest = Vector2Length(dirTest);
 
-		DrawCircle(
-			static_cast<int>(c->pos.x),
-			static_cast<int>(c->pos.y),
-			300,
-			PINK
-		);
+		
 		//cout << c->pos.x<<" ";
 		//cout << c->pos.y << " ";
 		if (distTest <= 2.5f) {
@@ -842,12 +837,7 @@ public:
 		}
 		c->Update(GetFrameTime());
 		//cout << "running 3";
-		DrawCircle(
-			static_cast<int>(dest.first * 10 + 5),
-			static_cast<int>(dest.second * 10 + 5),
-			200,
-			ORANGE
-		);
+		
 		return running;
 	
 	}

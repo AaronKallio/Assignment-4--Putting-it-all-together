@@ -49,7 +49,7 @@ void DrawCharacters(){
             DrawCircle(
                 static_cast<int>(c.pos.x),
                 static_cast<int>(c.pos.y),
-                1,
+                2,
                 BLUE
             );
             break;
@@ -57,7 +57,7 @@ void DrawCharacters(){
             DrawCircle(
                 static_cast<int>(c.pos.x),
                 static_cast<int>(c.pos.y),
-                1,
+                2,
                 ORANGE
             );
             break;
@@ -65,7 +65,7 @@ void DrawCharacters(){
             DrawCircle(
                 static_cast<int>(c.pos.x),
                 static_cast<int>(c.pos.y),
-                1,
+                2,
                 PURPLE
             );
             break;
@@ -73,8 +73,16 @@ void DrawCharacters(){
             DrawCircle(
                 static_cast<int>(c.pos.x),
                 static_cast<int>(c.pos.y),
-                1,
+                2,
                 MAGENTA
+            );
+            break;
+        case soldier:
+            DrawCircle(
+                static_cast<int>(c.pos.x),
+                static_cast<int>(c.pos.y),
+                2,
+                PURPLE
             );
             break;
         
@@ -305,8 +313,8 @@ Task* BuildSoldierTree(Character* c, Map* m) {
 
 
     soldierSequence->AddChild(new TravelTask(c, c->trainingGroundPos, m, false));
+    soldierSequence->AddChild(new SoldierTask(c, m));
     soldierSequence->AddChild(new UpgradeTask(c, soldier, 60));
-    soldierSequence->AddChild(new SoldierTask(c,m));
     soldierSequence->AddChild(new TravelTask(c, c->soldierGather, m, false));
     soldierSequence->AddChild(idle);
 

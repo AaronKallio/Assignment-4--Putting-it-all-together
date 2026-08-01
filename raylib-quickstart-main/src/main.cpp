@@ -29,9 +29,27 @@ int main()
         
         
         //ball.Draw();
+
+        if (IsKeyPressed(KEY_ONE)) {
+            gameSpeed = 1;
+        }
+
+        if (IsKeyPressed(KEY_TWO)) {
+            gameSpeed = 10;
+        }
+
+        if (IsKeyPressed(KEY_THREE)) {
+            gameSpeed = 100;
+        }
+
+
+
+
+
         for(int i = 0; i < gameSpeed; i++){
             //RunMap();
             //RunCharacters();
+
             if (frame==60) {
                 frame = 1;
             }

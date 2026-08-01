@@ -19,7 +19,7 @@ int craftsmen;
 int swordsForUse = 0;
 int buildingCount = 0;
 int workerForBuilding = 12;
-
+bool soldiersRecruited = false;
 std::vector<int> futureSoldiers;
 
 
@@ -39,6 +39,18 @@ void DrawItemsCollected(){
     std::string str5 = "Sword = " + to_string(sword);
     const char* cstr5 = str5.c_str();
     DrawText(cstr5, 507, 5, 10, ORANGE);
+
+
+
+    std::string soldierCount = "Soldiers = " + to_string(soldiers);
+    const char* soldierCount1 = soldierCount.c_str();
+    DrawText(soldierCount1, 750, 5, 10, ORANGE);
+
+    std::string instructions = "press 1 for 1x, 2 for 10x, 3 for 100x";
+    const char* instructions1 = instructions.c_str();
+    DrawText(instructions1, 750, 990, 10, ORANGE);
+    
+
 }
 extern Map& map;
 extern std::vector<Character> characters;
@@ -57,7 +69,7 @@ void Place() {
         characters.emplace_back(c);
     }
     cout << "Characters placed: " << characters.size() << '\n';
-    cout << "test " << '\n';
+   // cout << "test " << '\n';
 }
 
 
@@ -161,12 +173,15 @@ void AssignSoldiers() {
 }
 
 void SoldierSlots() {
-    if (sword>=20) {
+    if (sword>=20&&!soldiersRecruited) {
         //soldiers++;
         //swordsForUse 
         for (int i = 0; i < futureSoldiers.size(); i++) {
             soldiers++;
             characters[futureSoldiers[i]].behaviourTree = BuildSoldierTree(&characters[futureSoldiers[i]], &map);
+            characters[futureSoldiers[i]].state = active;
+            characters[futureSoldiers[i]].behaviourTree->Run();
+            soldiersRecruited = true;
         }
     }
 }

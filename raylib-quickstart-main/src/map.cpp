@@ -64,7 +64,7 @@ void Map::MapFill(const std::string& fileName) {
 
     std::ifstream file(fileName);
     if (!file.is_open()) {
-        cout << "bruh\n";
+        //cout << "bruh\n";
         return;
     }
 
@@ -161,19 +161,28 @@ void Map::DrawMap() {
         //DrawRectangle(270,540,10,10,BLACK);
         for(int j = 0;j < current.objects.size();j++){
             if(current.objects[j].type == ObjectType::Tree&&current.discovered == true){
-                //DrawCircle(
-                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
-                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
-                //    1,
-                //    DARKGREEN);
-                DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKGREEN);
+                DrawCircle(
+                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
+                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    1,
+                    DARKGREEN);
+                //DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKGREEN);
+                
                 //std::string str1 = to_string(current.objects[j].locked);
                 //const char* cstr1 = str1.c_str();
                 //DrawText(cstr1, current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, 20, WHITE);
                 //cout<<current.objects[j].locked<<'\n';
             }
             else if(current.objects[j].type == ObjectType::Ore &&current.discovered == true){
-                DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,RED);
+
+                DrawCircle(
+                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
+                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    1,
+                    RED);
+
+                //DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,RED);
+                
                 //std::string str1 =to_string(current.objects[j].locked);
                 //const char* cstr1 = str1.c_str();
                 //DrawText(cstr1, current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y,20,WHITE);
@@ -185,7 +194,16 @@ void Map::DrawMap() {
                 //    RED);
             }
             else if(current.objects[j].type == ObjectType::ChoppedTree &&current.discovered == true){
-                DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKBROWN);
+
+                DrawCircle(
+                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
+                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    1,
+                    DARKBROWN);
+
+                //DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKBROWN);
+                
+                
                 //DrawCircle(
                 //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
                 //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
@@ -193,7 +211,17 @@ void Map::DrawMap() {
                 //    RED);
             }
             else if (current.objects[j].type == ObjectType::Coal && current.discovered == true) {
-                DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, BLACK);
+
+
+                DrawCircle(
+                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
+                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    1,
+                    BLACK);
+
+
+                //DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, BLACK);
+
                 //DrawCircle(
                 //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
                 //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
@@ -201,7 +229,17 @@ void Map::DrawMap() {
                 //    RED);
             }
             else if (current.objects[j].type == ObjectType::IronBar && current.discovered == true) {
-                DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, DARKGRAY);
+
+
+                DrawCircle(
+                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
+                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    1,
+                    DARKGRAY);
+
+                //DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, DARKGRAY);
+
+
                 //DrawCircle(
                 //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
                 //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
@@ -209,7 +247,16 @@ void Map::DrawMap() {
                 //    RED);
             }
             else if (current.objects[j].type == ObjectType::Sword && current.discovered == true) {
-                DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, SKYBLUE);
+
+
+                DrawCircle(
+                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
+                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    1,
+                    SKYBLUE);
+
+                //DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, SKYBLUE);
+
                 //DrawCircle(
                 //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
                 //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
