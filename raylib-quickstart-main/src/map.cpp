@@ -19,6 +19,8 @@ int ore = 0;
 int coal = 0;
 int ironBar = 0;
 int sword = 0;
+constexpr int screenWidth = 1000;
+constexpr int screenHeight = 1000;
 
 namespace {
     const int dRow[8] = {-1, 1, 0, 0, -1, -1, 1, 1};
@@ -130,15 +132,11 @@ void Map::ConnectNodes() {
 
 
 void Map::DrawMap() {
-    //cout << "bob" << endl;
 	for (int y = 0; y < grid.size(); ++y) {
     for (int x = 0; x < grid[y].size(); ++x) {
         Node& current = grid[y][x];
-            //out << current.type << endl;
-		
 		char tempType = current.type;
         if (current.discovered == false) {
-            //DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
             continue;
 		}
 		if (tempType == 'T') {
@@ -155,121 +153,93 @@ void Map::DrawMap() {
 
 		}
         else if (tempType == 'M') {
-				//DrawRect(bottomLeft, topRight, cGreen, true);
             DrawRectangle(current.position.x,current.position.y,10,10,GREEN);
 		}
-        //DrawRectangle(270,540,10,10,BLACK);
         for(int j = 0;j < current.objects.size();j++){
             if(current.objects[j].type == ObjectType::Tree&&current.discovered == true){
                 DrawCircle(
-                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
-                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    current.position.x + current.objects[j].localPos.x,
+                    current.position.y + current.objects[j].localPos.y,
                     1,
                     DARKGREEN);
-                //DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKGREEN);
-                
-                //std::string str1 = to_string(current.objects[j].locked);
-                //const char* cstr1 = str1.c_str();
-                //DrawText(cstr1, current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, 20, WHITE);
-                //cout<<current.objects[j].locked<<'\n';
             }
             else if(current.objects[j].type == ObjectType::Ore &&current.discovered == true){
 
                 DrawCircle(
-                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
-                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    current.position.x + current.objects[j].localPos.x,
+                    current.position.y + current.objects[j].localPos.y,
                     1,
                     RED);
 
-                //DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,RED);
-                
-                //std::string str1 =to_string(current.objects[j].locked);
-                //const char* cstr1 = str1.c_str();
-                //DrawText(cstr1, current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y,20,WHITE);
-                //cout << current.objects[j].locked;
-                //DrawCircle(
-                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
-                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
-                //    1,
-                //    RED);
             }
             else if(current.objects[j].type == ObjectType::ChoppedTree &&current.discovered == true){
 
                 DrawCircle(
-                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
-                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    current.position.x + current.objects[j].localPos.x,
+                    current.position.y + current.objects[j].localPos.y,
                     1,
                     DARKBROWN);
 
-                //DrawPixel(current.position.x + current.objects[j].localPos.x,current.position.y + current.objects[j].localPos.y,DARKBROWN);
-                
-                
-                //DrawCircle(
-                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
-                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
-                //    1,
-                //    RED);
             }
             else if (current.objects[j].type == ObjectType::Coal && current.discovered == true) {
 
 
                 DrawCircle(
-                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
-                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    current.position.x + current.objects[j].localPos.x,
+                    current.position.y + current.objects[j].localPos.y,
                     1,
                     BLACK);
-
-
-                //DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, BLACK);
-
-                //DrawCircle(
-                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
-                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
-                //    1,
-                //    RED);
             }
             else if (current.objects[j].type == ObjectType::IronBar && current.discovered == true) {
 
 
                 DrawCircle(
-                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
-                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    current.position.x + current.objects[j].localPos.x,
+                    current.position.y + current.objects[j].localPos.y,
                     1,
                     DARKGRAY);
-
-                //DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, DARKGRAY);
-
-
-                //DrawCircle(
-                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
-                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
-                //    1,
-                //    RED);
             }
             else if (current.objects[j].type == ObjectType::Sword && current.discovered == true) {
 
 
                 DrawCircle(
-                    current.position.x + current.objects[j].localPos.x,//static_cast<int>(c.pos.x),
-                    current.position.y + current.objects[j].localPos.y,//static_cast<int>(c.pos.y),
+                    current.position.x + current.objects[j].localPos.x,
+                    current.position.y + current.objects[j].localPos.y,
                     1,
                     SKYBLUE);
-
-                //DrawPixel(current.position.x + current.objects[j].localPos.x, current.position.y + current.objects[j].localPos.y, SKYBLUE);
-
-                //DrawCircle(
-                //    current.position.x + current.objects[j].second.first,//static_cast<int>(c.pos.x),
-                //    current.position.y + current.objects[j].second.second,//static_cast<int>(c.pos.y),
-                //    1,
-                //    RED);
             }
 
-            //cout<<"--------------"<<'\n';
         }
 		}
 	}
         
     }
+
+
+//RenderTexture2D mapTexture = LoadRenderTexture(screenWidth, screenHeight);
+RenderTexture2D mapTexture;
+void LoadTextureRender() {
+    mapTexture = LoadRenderTexture(screenWidth, screenHeight);
+}
+
+void BakeMapTexture() {
+    BeginTextureMode(mapTexture);
+    ClearBackground(BLANK);
+    theMap.DrawMap();
+    EndTextureMode();
+}
+
+void DrawMapOptimized() {
+    DrawTextureRec(mapTexture.texture,  { 0, 0, (float)mapTexture.texture.width, (float)-mapTexture.texture.height },  { 0, 0 }, WHITE);
+}
+
+
+void UpdateMapTexture() {
+    if(theMap.updateMap) {
+        BakeMapTexture();
+        theMap.updateMap = false;
+    }
+}
 
 
 void Node::PlaceTrees(int count) {    
@@ -447,6 +417,7 @@ void Map::RemoveItem(int y, int x,int characterNum,ObjectType object){
             return; 
         } 
        } 
+    updateMap = true;
     }
 
 Pair Map::BFS(Pair start, ObjectType theObject, std::vector<Pair>& outPath, int characterNum){
@@ -660,6 +631,8 @@ void Map::AddObject(int row, int col, ObjectType type){
     -1};
     grid[row][col].objects.emplace_back(insertObj);
 
+    updateMap = true;
+
 }
 
 /*
@@ -754,6 +727,7 @@ Pair Map::RandomUndiscovered()
 
 
 void Map::Discover(int row, int col){
+    /*
     grid[row+1][col].discovered = true; 
     grid[row+1][col+1].discovered = true; 
     grid[row][col+1].discovered = true; 
@@ -762,6 +736,19 @@ void Map::Discover(int row, int col){
     grid[row-1][col-1].discovered = true; 
     grid[row-1][col].discovered = true; 
     grid[row][col-1].discovered = true; 
+    */
+
+    for (int i = -1; i < 2; i++) {
+        for (int j = -1; j < 2; j++) {
+            if(grid[row + i][col + j].discovered == false){
+                grid[row + i][col + j].discovered = true;
+                updateMap = true;
+            }
+            
+
+        }
+    }
+
 }
 
 
@@ -813,6 +800,7 @@ void Map::DeleteItems(Pair location, int amount) {
             grid[location.first][location.second].objects.pop_back();
 
         }
+        updateMap = true;
 }
 
 void Map::RemoveWood(int amount) {

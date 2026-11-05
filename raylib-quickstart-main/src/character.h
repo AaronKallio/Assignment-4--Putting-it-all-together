@@ -394,6 +394,7 @@ public:
 		map->RemoveItem(static_cast<int>(c->pos.y / 10),static_cast<int>(c->pos.x / 10),c->characterNum,ObjectType::Tree);
 		//c->pos = {0,0};
 		//cout<<"idk man";
+		//BakeMapTexture();
         return success;
     }
 };

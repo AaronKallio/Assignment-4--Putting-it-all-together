@@ -12,6 +12,13 @@ using namespace std;
 
 void FillMap();
 void RunMap();
+void UpdateMapTexture();
+
+//RenderTexture2D mapTexture;
+void DrawMapOptimized();
+void BakeMapTexture();
+void LoadTextureRender();
+
 //int WhichMap();
 
 //enum class ObjectType : char {
@@ -97,7 +104,7 @@ public:
 	void Discover(int row, int col);
 	Pair FindFrontier();
 	Pair FindIron(Pair location, int characterNum);
-
+	bool updateMap = false;
 
 	bool UseItems(Pair location, int amount);
 	Pair woodLocation = { 97,4 };
@@ -134,4 +141,6 @@ private:
 //void RunDijkstra(int mapNum);
 //void getDirection(Pair start, Pair end, int dRow[8], int dCol[8]);
 Map& GetMap();
+
+
 //void InitObjectTextures();

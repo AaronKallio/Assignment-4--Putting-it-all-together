@@ -3,14 +3,14 @@
 //#include "map.h"
 //#include "character.h"
 #include "manager.h"
-
+constexpr int screenWidth = 1000;
+constexpr int screenHeight = 1000;
 
 int main() 
 {
     const Color darkGreen = {20, 160, 133, 255};
     
-    constexpr int screenWidth = 1000;
-    constexpr int screenHeight = 1000;
+    
     InitWindow(screenWidth, screenHeight, "Assignment 4 Aaron Kallio");
     //InitObjectTextures();
     //SetTargetFPS(120);
@@ -23,6 +23,9 @@ int main()
     AssignSoldiers();
     int gameSpeed = 100;
     int frame = 1;
+
+    //mapTexture = LoadRenderTexture(screenWidth, screenHeight);
+    LoadTextureRender();
     while (!WindowShouldClose())
     {
         //ball.Update();
@@ -68,7 +71,9 @@ int main()
         }
         BeginDrawing();
         ClearBackground(BLACK);
-        RunMap();
+
+        //RunMap();
+        DrawMapOptimized();
         DrawBuildings();
         DrawCharacters();
         DrawItemsCollected();
@@ -76,6 +81,7 @@ int main()
         //RunMap();
         //DrawCharacters();
         //RunTask();
+        UpdateMapTexture();
         int fps = GetFPS();
         DrawText(TextFormat("FPS: %d", fps), 10, 10, 20, PURPLE);
         EndDrawing();
